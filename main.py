@@ -8,12 +8,12 @@ if __name__ == '__main__':
     pygame.init()
 
     pygame.display.set_caption('game')
-    pygame.display.set_icon(pygame.image.load('pic.png'))
+    pygame.display.set_icon(pygame.image.load('data/pic.png'))
 
     size = width, height = 1600, 900
     screen = pygame.display.set_mode(size)
 
-    bg = pygame.transform.scale(pygame.image.load('bg.jpg'), (1600, 900))
+    bg = pygame.transform.scale(pygame.image.load('data/bg.jpg'), (1600, 900))
     bg_2 = pygame.Surface((1600, 900))
     bg_2.fill(bg.get_at((0, 0)))
 

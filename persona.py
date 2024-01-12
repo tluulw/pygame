@@ -32,7 +32,7 @@ class Person(pygame.sprite.Sprite):
         pygame.time.wait(40)
         if self.jump_animation_cnt > 10:
             self.jump_animation_cnt = 10
-        self.image = pygame.image.load(f'jumping_hero/jump{self.jump_animation_cnt}.png')
+        self.image = pygame.image.load(f'data/jumping_hero/jump{self.jump_animation_cnt}.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -57,7 +57,7 @@ class Person(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def default_image(self):
-        self.image = pygame.image.load('pic.png')
+        self.image = pygame.image.load('data/pic.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -74,7 +74,7 @@ class Person(pygame.sprite.Sprite):
 
     def run_animation(self):
         pygame.time.wait(40)
-        self.image = pygame.image.load(f'running_hero/run{self.run_animation_cnt}.png')
+        self.image = pygame.image.load(f'data/running_hero/run{self.run_animation_cnt}.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -93,7 +93,7 @@ class Person(pygame.sprite.Sprite):
                 self.pos = self.pos[0], self.pos[1] + 0.5
                 self.rect = self.image.get_rect(center=self.pos)
         else:
-            self.image = pygame.image.load(f'hero_onthewall.png')
+            self.image = pygame.image.load('data/hero_onthewall.png')
             self.image.set_colorkey(self.image.get_at((0, 0)))
             if right:
                 self.image = pygame.transform.flip(self.image, True, False)
