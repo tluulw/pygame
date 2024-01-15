@@ -22,14 +22,14 @@ class Person(pygame.sprite.Sprite):
 
         self.on_the_wall = False
 
-        self.wall = False
-
         self.screen_x = screen_x
+
+        self.b_d = False
 
         self.default_image()
 
     def jump_animation(self):
-        pygame.time.wait(40)
+        #pygame.time.wait(10)
         if self.jump_animation_cnt > 10:
             self.jump_animation_cnt = 10
         self.image = pygame.image.load(f'data/jumping_hero/jump{self.jump_animation_cnt}.png')
@@ -41,17 +41,18 @@ class Person(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def jump(self):
+        pygame.time.wait(15)
         if self.flip:
             if self.jump_count > 0:
-                self.pos = self.pos[0], self.pos[1] - (self.jump_count ** 2) / 2
+                self.pos = self.pos[0], self.pos[1] - (self.jump_count ** 2) / 4
             else:
-                self.pos = self.pos[0], self.pos[1] + (self.jump_count ** 2) / 2
+                self.pos = self.pos[0], self.pos[1] + (self.jump_count ** 2) / 4
         else:
             if self.jump_count > 0:
-                self.pos = self.pos[0], self.pos[1] - (self.jump_count ** 2) / 2
+                self.pos = self.pos[0], self.pos[1] - (self.jump_count ** 2) / 4
             else:
-                self.pos = self.pos[0], self.pos[1] + (self.jump_count ** 2) / 2
-        self.per_run_speed = (self.jump_count ** 2) / 2
+                self.pos = self.pos[0], self.pos[1] + (self.jump_count ** 2) / 4
+        self.per_run_speed = (self.jump_count ** 2) / 4
         self.run()
         self.per_run_speed = 12
         self.rect = self.image.get_rect(center=self.pos)
@@ -73,7 +74,7 @@ class Person(pygame.sprite.Sprite):
             self.screen_x -= self.per_run_speed
 
     def run_animation(self):
-        pygame.time.wait(40)
+        pygame.time.wait(20)
         self.image = pygame.image.load(f'data/running_hero/run{self.run_animation_cnt}.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
@@ -101,7 +102,8 @@ class Person(pygame.sprite.Sprite):
             self.is_reverse_jump = False
             self.jump_animation_cnt = 0
             self.jump_count = 10
-            self.flip = not self.flip
+            if (right and self.flip) or (left and not self.flip):
+                self.flip = not self.flip
             self.image = pygame.transform.scale(self.image,
                                                 (self.image.get_width() * 1.5, self.image.get_height() * 1.5))
             self.pos = other[0], self.pos[1]
@@ -125,14 +127,20 @@ class Person(pygame.sprite.Sprite):
             self.jump_animation_cnt += 1
             self.jump_animation()
         self.jump()
-        self.jump_count -= 1
+        if self.b_d:
+            self.jump_count -= 0.5
+        else:
+            self.jump_count -= 1
 
     def jump_reverse_upping(self):
         if self.jump_count % 2 == 0 and self.jump_count != -10:
             self.jump_animation_cnt += 1
             self.jump_animation()
         self.jump()
-        self.jump_count -= 1
+        if self.b_d:
+            self.jump_count -= 0.5
+        else:
+            self.jump_count -= 1
 
     def reverse_jump_landing(self):
         if self.flip:
@@ -170,6 +178,13 @@ class Person(pygame.sprite.Sprite):
         self.run()
         self.run_animation()
 
+    def floor_collide(self, other, top, bottom):
+        if bottom:
+            if self.pos[1] > 840:
+                self.reverse_jump_landing()
+            else:
+                self.run()
+                self.pos = self.pos[0], self.pos[1] - 12
     def is_collide(self, walls, obstacles):
         if not pygame.sprite.spritecollideany(self, walls):
             self.on_the_wall = False
@@ -181,6 +196,9 @@ class Person(pygame.sprite.Sprite):
             elif self.rect.colliderect(el.right_border):
                 self.per_run_speed = 0
                 self.wall_collide(el.right_border, False, True)
+            elif self.rect.colliderect(el.bottom_border):
+                self.floor_collide(el.bottom_border, False, True)
+                pass
             elif not self.on_the_wall and not any(sp) and self.pos[1] < 840:
                 self.flip = not self.flip
                 self.jump_landing()

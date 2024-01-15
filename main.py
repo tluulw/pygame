@@ -1,8 +1,8 @@
 import pygame
 
+from floor import Floor
 from persona import Person
 from wall import Wall
-
 
 if __name__ == '__main__':
     pygame.init()
@@ -14,32 +14,35 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
 
     bg = pygame.transform.scale(pygame.image.load('data/bg.jpg'), (1600, 900))
-    bg_2 = pygame.Surface((1600, 900))
-    bg_2.fill(bg.get_at((0, 0)))
+    bg_day = pygame.transform.scale(pygame.image.load('data/bg_day.jpg'), (1600, 900))
 
     clock = pygame.time.Clock()
 
     walls = pygame.sprite.Group()
+    floors = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
 
     jump_sound = pygame.mixer.Sound("action_jump.mp3")
 
+
     def level_creator(level_name, walls, obstacles):
-        level = []
         cnt = 0
         with open(f'{level_name}', encoding='UTF-8') as file:
             for i in file.readlines():
                 for x in i:
                     if x == '|':
                         Wall(cnt, i.find(x), walls)
+                        i = i.replace(x, '.', 1)
+                    if x == '_':
+                        Floor(cnt, i.find(x), floors)
+                        i = i.replace(x, '.', 1)
                 cnt += 1
 
         player = Person(0)
         return player
 
-    per = level_creator('level', walls, obstacles)
 
-    b_d = False
+    per = level_creator('level', walls, obstacles)
 
     running = True
 
@@ -52,7 +55,9 @@ if __name__ == '__main__':
         else:
             screen.blit(bg, (per.screen_x - 1600, 0))
         walls.update(per)
+        floors.update(per)
         per.is_collide(walls, obstacles)
+        floors.draw(screen)
         walls.draw(screen)
         screen.blit(per.image, per.rect)
 
@@ -70,7 +75,7 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    b_d = True
+                    per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
                         per.is_jump = True
                         jump_sound.play()
@@ -82,9 +87,11 @@ if __name__ == '__main__':
                         per.is_reverse_jump = True
                         per.flip = not per.flip
                         jump_sound.play()
+                if event.key == pygame.K_ESCAPE:
+                    running = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    b_d = False
+                    per.b_d = False
         pygame.display.flip()
-        clock.tick(180)
+        clock.tick(60)
     pygame.quit()

@@ -8,7 +8,6 @@ class Wall(pygame.sprite.Sprite):
         self.image = pygame.image.load('data/walls/default_wall.png')
         self.image = pygame.transform.scale(self.image, (40, 180))
         self.rect = pygame.Rect(self.pos[0], self.pos[1], 40, 180)
-        self.top_border = pygame.Rect(self.rect[0], self.rect[1] - 1, self.rect[2], 1)
         self.left_border = pygame.Rect(self.rect[0] - 1, self.rect[1], 1, self.rect[3])
         self.right_border = pygame.Rect(self.rect[0] + 40, self.rect[1], 1, self.rect[3])
 
