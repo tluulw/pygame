@@ -3,13 +3,10 @@ import pygame
 from floor import Floor
 from persona import Person
 from wall import Wall
+from menu import Menu
 
 if __name__ == '__main__':
     pygame.init()
-
-    pygame.display.set_caption('game')
-    pygame.display.set_icon(pygame.image.load('data/pic.png'))
-
     size = width, height = 1600, 900
     screen = pygame.display.set_mode(size)
 
@@ -42,7 +39,12 @@ if __name__ == '__main__':
         return player
 
 
-    per = level_creator('level', walls, obstacles)
+    per = level_creator('data/levels/level.txt', walls, obstacles)
+
+    game_menu = True
+    menu_tab = "main"
+    block_hotkey = 0
+    change_tab = 1
 
     running = True
 
@@ -61,6 +63,57 @@ if __name__ == '__main__':
         walls.draw(screen)
         screen.blit(per.image, per.rect)
 
+        if game_menu == True:
+            menu = Menu(size, screen)
+            if change_tab == 1:
+                btn_tab = menu.menu_rendering1()
+            if change_tab == 2:
+                btn_tab = menu.menu_rendering2()
+            if change_tab == 3:
+                btn_tab = menu.menu_rendering3()
+            if btn_tab == 1:
+                menu_tab = "main"
+                game_menu = False
+                block_hotkey = 1
+
+            if btn_tab == 100:
+                running = False
+
+            if btn_tab == 102:
+                change_tab = 2
+
+            if btn_tab == 101:
+                change_tab = 1
+
+            if btn_tab == 103:
+                change_tab = 3
+
+            if btn_tab == 'lvl1_btn':
+                level_creator('data/levels/level1.txt', walls, obstacles)
+                menu_tab = "main"
+                game_menu = False
+                block_hotkey = 1
+            if btn_tab == 'lvl2_btn':
+                level_creator('data/levels/level2.txt', walls, obstacles)
+                menu_tab = "main"
+                game_menu = False
+                block_hotkey = 1
+            if btn_tab == 'lvl3_btn':
+                level_creator('data/levels/level3.txt', walls, obstacles)
+                menu_tab = "main"
+                game_menu = False
+                block_hotkey = 1
+            if btn_tab == 'lvl4_btn':
+                level_creator('data/levels/level4.txt', walls, obstacles)
+                menu_tab = "main"
+                game_menu = False
+                block_hotkey = 1
+            if btn_tab == 'lvl5_btn':
+                level_creator('data/levels/level5.txt', walls, obstacles)
+                menu_tab = "main"
+                game_menu = False
+                block_hotkey = 1
+
         if per.is_jump:
             per.if_is_jump()
 
@@ -73,8 +126,17 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and block_hotkey == 1:
+                if event.key == pygame.K_ESCAPE:
+                    game_menu = True
+                    block_hotkey = 0
+                    for sprite in walls:
+                        sprite.kill()
+                    for sprite in floors:
+                        sprite.kill()
+                    for sprite in obstacles:
+                        sprite.kill()
+                elif event.key == pygame.K_SPACE:
                     per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
                         per.is_jump = True
@@ -87,9 +149,7 @@ if __name__ == '__main__':
                         per.is_reverse_jump = True
                         per.flip = not per.flip
                         jump_sound.play()
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            if event.type == pygame.KEYUP:
+            if event.type == pygame.KEYUP and block_hotkey == 1:
                 if event.key == pygame.K_SPACE:
                     per.b_d = False
         pygame.display.flip()
