@@ -1,9 +1,9 @@
 import pygame
 
 from floor import Floor
+from menu import Menu
 from persona import Person
 from wall import Wall
-from menu import Menu
 
 if __name__ == '__main__':
     pygame.init()
@@ -46,9 +46,19 @@ if __name__ == '__main__':
     block_hotkey = 0
     change_tab = 1
 
+    floor = pygame.Rect(0, 895, 1600, 5)
+
     running = True
 
     while running:
+        if per.rect.colliderect(floor):
+            per.floor_rect = floor
+            per.on_the_floor = True
+        if per.pos[1] == 840:
+            if per.pos[0] <= 800 - 12:
+                per.pos = per.pos[0] + 12, per.pos[1]
+            elif per.pos[0] >= 800 + 12:
+                per.pos = per.pos[0] - 12, per.pos[1]
         if -1600 >= per.screen_x or 1600 <= per.screen_x:
             per.screen_x = 0
         screen.blit(bg, (per.screen_x, 0))
@@ -58,7 +68,7 @@ if __name__ == '__main__':
             screen.blit(bg, (per.screen_x - 1600, 0))
         walls.update(per)
         floors.update(per)
-        per.is_collide(walls, obstacles)
+        per.is_collide(walls, floors, obstacles, floor)
         floors.draw(screen)
         walls.draw(screen)
         screen.blit(per.image, per.rect)

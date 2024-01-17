@@ -17,3 +17,4 @@ class Floor(pygame.sprite.Sprite):
         else:
             self.pos = self.pos[0] - per.per_run_speed, self.pos[1]
         self.rect = pygame.Rect(self.pos[0], self.pos[1], 200, 30)
+        self.top_border = pygame.Rect(self.rect[0], self.rect[1] - 1, self.rect[2], 1)

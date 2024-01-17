@@ -10,6 +10,7 @@ class Wall(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.pos[0], self.pos[1], 40, 180)
         self.left_border = pygame.Rect(self.rect[0] - 1, self.rect[1], 1, self.rect[3])
         self.right_border = pygame.Rect(self.rect[0] + 40, self.rect[1], 1, self.rect[3])
+        self.top_border = pygame.Rect(self.rect[0], self.rect[1] - 1, self.rect[2], 1)
 
     def update(self, per):
         if per.flip:
@@ -17,5 +18,6 @@ class Wall(pygame.sprite.Sprite):
         else:
             self.pos = self.pos[0] - per.per_run_speed, self.pos[1]
         self.rect = pygame.Rect(self.pos[0], self.pos[1], 40, 180)
-        self.left_border = pygame.Rect(self.rect[0] - 1, self.rect[1], 1, self.rect[3])
-        self.right_border = pygame.Rect(self.rect[0] + 40, self.rect[1], 1, self.rect[3])
+        self.left_border = pygame.Rect(self.rect[0] - 1, self.rect[1] + 20, 1, self.rect[3] - 20)
+        self.right_border = pygame.Rect(self.rect[0] + 40, self.rect[1] + 20, 1, self.rect[3] - 20)
+        self.top_border = pygame.Rect(self.rect[0], self.rect[1] - 1, self.rect[2], 1)
