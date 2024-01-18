@@ -3,6 +3,7 @@ import pygame
 from floor import Floor
 from menu import Menu
 from persona import Person
+from spike import Spike
 from wall import Wall
 
 if __name__ == '__main__':
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     jump_sound = pygame.mixer.Sound("action_jump.mp3")
 
 
-    def level_creator(level_name, walls, obstacles):
+    def level_creator(level_name):
         cnt = 0
         with open(f'{level_name}', encoding='UTF-8') as file:
             for i in file.readlines():
@@ -33,18 +34,23 @@ if __name__ == '__main__':
                     if x == '_':
                         Floor(cnt, i.find(x), floors)
                         i = i.replace(x, '.', 1)
+                    if x == '*':
+                        if i[i.find(x) + 1] == '|':
+                            Spike(cnt, i.find(x), True, False, obstacles)
+                        else:
+                            Spike(cnt, i.find(x), False, True, obstacles)
+                        i = i.replace(x, '.', 1)
                 cnt += 1
-
-        player = Person(0)
-        return player
+        return Person(0)
 
 
-    per = level_creator('data/levels/level.txt', walls, obstacles)
+    per = level_creator('data/levels/level.txt')
 
     game_menu = True
     menu_tab = "main"
     block_hotkey = 0
     change_tab = 1
+    btn_tab = 0
 
     floor = pygame.Rect(0, 895, 1600, 5)
 
@@ -54,7 +60,7 @@ if __name__ == '__main__':
         if per.rect.colliderect(floor):
             per.floor_rect = floor
             per.on_the_floor = True
-        if per.pos[1] == 840:
+        if per.on_the_floor:
             if per.pos[0] <= 800 - 12:
                 per.pos = per.pos[0] + 12, per.pos[1]
             elif per.pos[0] >= 800 + 12:
@@ -68,12 +74,30 @@ if __name__ == '__main__':
             screen.blit(bg, (per.screen_x - 1600, 0))
         walls.update(per)
         floors.update(per)
+        obstacles.update(per)
         per.is_collide(walls, floors, obstacles, floor)
         floors.draw(screen)
         walls.draw(screen)
+        obstacles.draw(screen)
         screen.blit(per.image, per.rect)
 
-        if game_menu == True:
+        if per.is_jump:
+            per.if_is_jump()
+
+        if per.is_reverse_jump:
+            per.if_is_reverse_jump()
+
+        if per.is_run or per.is_reverse_run:
+            per.if_is_run()
+
+        if not (any((walls, obstacles, floors))):
+            game_menu = True
+            block_hotkey = 0
+            change_tab = 1
+            btn_tab = 0
+            level_creator('data/levels/level.txt')
+
+        if game_menu:
             menu = Menu(size, screen)
             if change_tab == 1:
                 btn_tab = menu.menu_rendering1()
@@ -99,39 +123,30 @@ if __name__ == '__main__':
                 change_tab = 3
 
             if btn_tab == 'lvl1_btn':
-                level_creator('data/levels/level1.txt', walls, obstacles)
+                level_creator('data/levels/level1.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl2_btn':
-                level_creator('data/levels/level2.txt', walls, obstacles)
+                level_creator('data/levels/level2.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl3_btn':
-                level_creator('data/levels/level3.txt', walls, obstacles)
+                level_creator('data/levels/level3.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl4_btn':
-                level_creator('data/levels/level4.txt', walls, obstacles)
+                level_creator('data/levels/level4.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl5_btn':
-                level_creator('data/levels/level5.txt', walls, obstacles)
+                level_creator('data/levels/level5.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
-
-        if per.is_jump:
-            per.if_is_jump()
-
-        if per.is_reverse_jump:
-            per.if_is_reverse_jump()
-
-        if per.is_run or per.is_reverse_run:
-            per.if_is_run()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
