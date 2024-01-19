@@ -1,5 +1,6 @@
-import pygame
+import pygame.mixer
 
+from coins import Coin
 from floor import Floor
 from menu import Menu
 from persona import Person
@@ -19,9 +20,20 @@ if __name__ == '__main__':
     walls = pygame.sprite.Group()
     floors = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
+    coins = pygame.sprite.Group()
 
-    jump_sound = pygame.mixer.Sound("action_jump.mp3")
+    jump_sound = pygame.mixer.Sound("data/action_jump.mp3")
+    pygame.mixer.music.load("data/bg_music.mp3")
 
+    vol = 0.5
+    pygame.mixer.music.set_volume(vol)
+    pygame.mixer.music.play(-1)
+
+
+    # change_bg1 = pygame.USEREVENT + 1
+    # change_bg2 = pygame.USEREVENT + 2
+
+    # pygame.time.set_timer(change_bg1, 15000)
 
     def level_creator(level_name):
         cnt = 0
@@ -30,15 +42,21 @@ if __name__ == '__main__':
                 for x in i:
                     if x == '|':
                         Wall(cnt, i.find(x), walls)
+                        if i[i.find(x) + 1] == '*':
+                            continue
                         i = i.replace(x, '.', 1)
                     if x == '_':
+                        Coin(cnt, i.find(x), coins)
                         Floor(cnt, i.find(x), floors)
                         i = i.replace(x, '.', 1)
                     if x == '*':
                         if i[i.find(x) + 1] == '|':
-                            Spike(cnt, i.find(x), True, False, obstacles)
+                            Spike(cnt, i.find(x), True, 90, False, obstacles)
+                        elif i[i.find(x) - 1] == '|':
+                            Spike(cnt, i.find(x), True, 270, False, obstacles)
+                            i = i.replace('|', '.', 1)
                         else:
-                            Spike(cnt, i.find(x), False, True, obstacles)
+                            Spike(cnt, i.find(x), False, 0, True, obstacles)
                         i = i.replace(x, '.', 1)
                 cnt += 1
         return Person(0)
@@ -75,10 +93,12 @@ if __name__ == '__main__':
         walls.update(per)
         floors.update(per)
         obstacles.update(per)
+        coins.update(per)
         per.is_collide(walls, floors, obstacles, floor)
         floors.draw(screen)
         walls.draw(screen)
         obstacles.draw(screen)
+        coins.draw(screen)
         screen.blit(per.image, per.rect)
 
         if per.is_jump:
@@ -87,7 +107,7 @@ if __name__ == '__main__':
         if per.is_reverse_jump:
             per.if_is_reverse_jump()
 
-        if per.is_run or per.is_reverse_run:
+        if per.is_run:
             per.if_is_run()
 
         if not (any((walls, obstacles, floors))):
@@ -174,6 +194,13 @@ if __name__ == '__main__':
                         per.is_reverse_jump = True
                         per.flip = not per.flip
                         jump_sound.play()
+            if event.type == pygame.KEYDOWN and block_hotkey == 0:
+                if event.key == pygame.K_DOWN:
+                    vol -= 0.1
+                    pygame.mixer.music.set_volume(vol)
+                if event.key == pygame.K_UP:
+                    vol += 0.1
+                    pygame.mixer.music.set_volume(vol)
             if event.type == pygame.KEYUP and block_hotkey == 1:
                 if event.key == pygame.K_SPACE:
                     per.b_d = False
