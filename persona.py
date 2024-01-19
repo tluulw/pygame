@@ -181,6 +181,16 @@ class Person(pygame.sprite.Sprite):
             self.floor_rect = other
             self.on_the_floor = True
 
+    def kill_all(self, walls, floors, obstacles, coins):
+        for sprite in walls:
+            sprite.kill()
+        for sprite in floors:
+            sprite.kill()
+        for sprite in obstacles:
+            sprite.kill()
+        for sprite in coins:
+            sprite.kill()
+
     def is_collide(self, walls, floors, obstacles, coins, floor):
         if not pygame.sprite.spritecollideany(self, walls):
             self.on_the_wall = False
@@ -204,11 +214,4 @@ class Person(pygame.sprite.Sprite):
                 self.floor_collide(el.top_border)
         for el in obstacles:
             if self.rect.colliderect(el.rect):
-                for sprite in walls:
-                    sprite.kill()
-                for sprite in floors:
-                    sprite.kill()
-                for sprite in obstacles:
-                    sprite.kill()
-                for sprite in coins:
-                    sprite.kill()
+                self.kill_all(walls, floors, obstacles, coins)

@@ -1,3 +1,5 @@
+import sqlite3
+
 import pygame.mixer
 
 from coins import Coin
@@ -62,6 +64,17 @@ if __name__ == '__main__':
         return level_name
 
 
+    def kill_all():
+        for sprite in walls:
+            sprite.kill()
+        for sprite in floors:
+            sprite.kill()
+        for sprite in obstacles:
+            sprite.kill()
+        for sprite in coins:
+            sprite.kill()
+
+
     per = Person(0)
 
     game_menu = True
@@ -69,14 +82,32 @@ if __name__ == '__main__':
     block_hotkey = 0
     change_tab = 1
     btn_tab = 0
-    level = ''
+    level = level_creator('data/levels/level.txt')
+
+    score = 0
 
     floor = pygame.Rect(0, 895, 1600, 5)
 
     running = True
 
     while running:
-        print(per.screen_x)
+        if not (any((walls, obstacles, floors, coins))):
+            if level != '':
+                with sqlite3.connect('game_data.db') as con:
+                    cur = con.cursor()
+                    cur.execute(
+                        f"""INSERT INTO results (level, coins, score) VALUES ('{level[17:][:1]}', 
+                        '{per.coins_collected}', '{score}')""")
+                    con.commit()
+            game_menu = True
+            menu_tab = "main"
+            block_hotkey = 0
+            change_tab = 1
+            btn_tab = 0
+            level = level_creator('data/levels/level.txt')
+
+        if round(per.screen_x) % 320 == 0 and level != '':
+            score += 1
         if per.rect.colliderect(floor):
             per.floor_rect = floor
             per.on_the_floor = True
@@ -86,6 +117,7 @@ if __name__ == '__main__':
             elif per.pos[0] >= 800 + 12:
                 per.pos = per.pos[0] - 12, per.pos[1]
         if -1600 >= per.screen_x or 1600 <= per.screen_x:
+            score += 1
             per.screen_x = 0
         screen.blit(bg, (per.screen_x, 0))
         if per.screen_x < 0:
@@ -111,15 +143,6 @@ if __name__ == '__main__':
 
         if per.is_run:
             per.if_is_run()
-
-        if not (any((walls, obstacles, floors, coins))):
-            print(level)
-            print(per.coins_collected)
-            game_menu = True
-            block_hotkey = 0
-            change_tab = 1
-            btn_tab = 0
-            level = level_creator('data/levels/level.txt')
 
         if game_menu:
             menu = Menu(size, screen)
@@ -179,14 +202,7 @@ if __name__ == '__main__':
                 if event.key == pygame.K_ESCAPE:
                     game_menu = True
                     block_hotkey = 0
-                    for sprite in walls:
-                        sprite.kill()
-                    for sprite in floors:
-                        sprite.kill()
-                    for sprite in obstacles:
-                        sprite.kill()
-                    for sprite in coins:
-                        sprite.kill()
+                    kill_all()
                 elif event.key == pygame.K_SPACE:
                     per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
@@ -212,4 +228,4 @@ if __name__ == '__main__':
                     per.b_d = False
         pygame.display.flip()
         clock.tick(60)
-    pygame.quit()
+pygame.quit()
