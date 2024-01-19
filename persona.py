@@ -2,7 +2,7 @@ import pygame
 
 
 class Person(pygame.sprite.Sprite):
-    def __init__(self, screen_x, *group):
+    def __init__(self, screen_x, person, screen, *group):
         super().__init__(*group)
         self.pos = 800, 840
 
@@ -31,12 +31,26 @@ class Person(pygame.sprite.Sprite):
 
         self.coins_collected = 0
 
+        self.jump_particle = ''
+        self.jump_particle_rect = ''
+        self.jump_particle_pos = (0, 0)
+        self.jump_particle_cnt = 0
+        self.jump_particle_b = False
+
+        self.screen = screen
+
+        self.person = person
+
         self.default_image()
 
     def jump_animation(self):
-        if self.jump_animation_cnt > 10:
-            self.jump_animation_cnt = 10
-        self.image = pygame.image.load(f'data/jumping_hero/jump{self.jump_animation_cnt}.png')
+        if self.person == 'samurai':
+            if self.jump_animation_cnt == 13:
+                self.jump_animation_cnt = 12
+        elif self.person == 'hero':
+            if self.jump_animation_cnt == 11:
+                self.jump_animation_cnt = 10
+        self.image = pygame.image.load(f'data/{self.person}/jumping_hero/jump{self.jump_animation_cnt}.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -62,7 +76,7 @@ class Person(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def default_image(self):
-        self.image = pygame.image.load('data/pic.png')
+        self.image = pygame.image.load(f'data/{self.person}/pic.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -79,7 +93,7 @@ class Person(pygame.sprite.Sprite):
 
     def run_animation(self):
         pygame.time.wait(25)
-        self.image = pygame.image.load(f'data/running_hero/run{self.run_animation_cnt}.png')
+        self.image = pygame.image.load(f'data/{self.person}/running_hero/run{self.run_animation_cnt}.png')
         self.image.set_colorkey(self.image.get_at((0, 0)))
         if self.flip:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -94,7 +108,7 @@ class Person(pygame.sprite.Sprite):
                 self.pos = self.pos[0], self.pos[1] + 0.5
                 self.rect = self.image.get_rect(center=self.pos)
         else:
-            self.image = pygame.image.load('data/hero_onthewall.png')
+            self.image = pygame.image.load(f'data/{self.person}/hero_onthewall.png')
             self.image.set_colorkey(self.image.get_at((0, 0)))
             if right:
                 self.image = pygame.transform.flip(self.image, True, False)
@@ -106,7 +120,13 @@ class Person(pygame.sprite.Sprite):
                 self.flip = not self.flip
             self.image = pygame.transform.scale(self.image,
                                                 (self.image.get_width() * 1.5, self.image.get_height() * 1.5))
-            self.pos = other[0], self.pos[1]
+            if self.person == 'samurai':
+                if left:
+                    self.pos = other[0] - 20, self.pos[1]
+                if right:
+                    self.pos = other[0] + 20, self.pos[1]
+            elif self.person == 'hero':
+                self.pos = other[0], self.pos[1]
             self.rect = self.image.get_rect(center=self.pos)
             self.on_the_wall = True
 
@@ -119,6 +139,7 @@ class Person(pygame.sprite.Sprite):
             self.is_jump = False
             self.jump_count = 10
             self.per_run_speed = 10
+            self.jump_particle_cnt = 0
         else:
             self.jump_animation_cnt = 5
             self.jump_count = 0
@@ -127,10 +148,36 @@ class Person(pygame.sprite.Sprite):
             else:
                 self.is_jump = True
 
+    def jump_particle_animation(self):
+        if self.jump_particle_cnt == 10:
+            self.jump_particle_b = False
+            return
+        self.jump_particle_cnt %= 10
+        self.jump_particle_cnt += 1
+        self.jump_particle = pygame.image.load(f'data/jump_particles/{self.jump_particle_cnt}.png')
+        if not self.flip:
+            self.jump_particle = pygame.transform.flip(self.jump_particle, True, False)
+        self.jump_particle = pygame.transform.scale(self.jump_particle, (self.jump_particle.get_width() * 0.25,
+                                                                         self.jump_particle.get_height() * 0.25))
+        self.jump_particle_rect = self.jump_particle.get_rect(center=self.jump_particle_pos)
+        self.screen.blit(self.jump_particle, self.jump_particle_rect)
+
     def jump_upping(self):
-        if self.jump_count % 2 == 0 and self.jump_count != -10:
-            self.jump_animation_cnt += 1
-            self.jump_animation()
+        if self.person == 'hero':
+            if self.jump_count % 2 == 0 and self.jump_count != -10:
+                self.jump_animation_cnt += 1
+                self.jump_animation()
+        elif self.person == 'samurai':
+            if self.jump_count > 0:
+                if self.jump_count % 2 == 1 and self.jump_count != -10:
+                    self.jump_animation_cnt += 1
+                    self.jump_animation()
+            else:
+                if self.jump_count <= -2:
+                    self.jump_animation_cnt += 1
+                    self.jump_animation()
+        if self.jump_particle_b:
+            self.jump_particle_animation()
         self.jump()
         if self.b_d:
             self.jump_count -= 0.25
@@ -145,6 +192,7 @@ class Person(pygame.sprite.Sprite):
         self.is_reverse_jump = False
         self.jump_count = 10
         self.per_run_speed = 10
+        self.jump_particle_cnt = 0
 
     def if_is_jump(self):
         self.on_the_floor = False

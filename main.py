@@ -75,7 +75,7 @@ if __name__ == '__main__':
             sprite.kill()
 
 
-    per = Person(0)
+    per = Person(0, 'samurai', screen)
 
     game_menu = True
     menu_tab = "main"
@@ -99,6 +99,9 @@ if __name__ == '__main__':
                         f"""INSERT INTO results (level, coins, score) VALUES ('{level[17:][:1]}', 
                         '{per.coins_collected}', '{score}')""")
                     con.commit()
+                per.coins_collected = 0
+                score = 0
+            per = Person(0, 'hero', screen)
             game_menu = True
             menu_tab = "main"
             block_hotkey = 0
@@ -206,10 +209,16 @@ if __name__ == '__main__':
                 elif event.key == pygame.K_SPACE:
                     per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
+                        per.jump_particle_cnt = 0
+                        per.jump_particle_b = True
+                        per.jump_particle_pos = per.pos
                         per.is_jump = True
                         jump_sound.play()
 
                     elif per.is_jump and not per.is_reverse_jump:
+                        per.jump_particle_cnt = 0
+                        per.jump_particle_b = True
+                        per.jump_particle_pos = per.pos
                         per.is_jump = False
                         per.jump_count = 10
                         per.jump_animation_cnt = 0
