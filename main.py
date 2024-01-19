@@ -155,6 +155,9 @@ if __name__ == '__main__':
                 btn_tab = menu.menu_rendering2()
             if change_tab == 3:
                 btn_tab = menu.menu_rendering3()
+            if change_tab == 4:
+                btn_tab = menu.menu_rendering4()
+
             if btn_tab == 1:
                 menu_tab = "main"
                 game_menu = False
