@@ -27,6 +27,8 @@ if __name__ == '__main__':
     jump_sound = pygame.mixer.Sound("data/action_jump.mp3")
     pygame.mixer.music.load("data/bg_music.mp3")
 
+    sounds = [jump_sound]
+
     vol = 0.5
     pygame.mixer.music.set_volume(vol)
     pygame.mixer.music.play(-1)
@@ -193,7 +195,7 @@ if __name__ == '__main__':
                 btn_tab = menu.menu_rendering1()
             if change_tab == 'options':
                 btn_tab = menu.options_menu_rendering2(events)
-                if btn_tab != 101:
+                if btn_tab != 'back':
                     vol = btn_tab[0] / 100
                     pygame.mixer.music.set_volume(vol)
                     for sound in sounds:
