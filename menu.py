@@ -27,11 +27,25 @@ class Menu:
         self.back_image = pygame.image.load('data/buttons/back.png')
         self.back_image.set_colorkey(self.back_image.get_at((0, 0)))
 
+        self.pause_image = pygame.image.load('data/buttons/pause.png')
+        self.pause_image.set_colorkey(self.pause_image.get_at((0, 0)))
+
+        self.pause_button = button.Button(0, 0, self.pause_image, 0.5)
+
         self.play_button = button.Button(size[0] / 2 - 250, 300, self.play_image, 1)
+
+        self.play_button_game = button.Button(size[0] / 2 - 125, 300, self.play_image, 0.5)
+
+        self.menu_button = button.Button(size[0] / 2 - 125, 400, self.options_image, 0.5)
+
+        self.to_main_button = button.Button(size[0] / 2 - 125, 500, self.back_image, 0.38)
+
         self.options_button = button.Button(size[0] - 250, size[1] - 79, self.options_image, 0.5)
+
         self.quit_button = button.Button(0, size[1] - 102, self.quit_image, 0.5)
 
         self.audio_button = button.Button(size[0] / 2 - 222, 300, self.audio_image, 2)
+
         self.back_button = button.Button(size[0] / 2 - 163, 550, self.back_image, 0.5)
 
         self.lvl1_img = pygame.image.load("data/buttons/1a.png")
@@ -71,4 +85,13 @@ class Menu:
             return 101
 
     def menu_rendering4(self):
-        pass
+        if self.pause_button.draw(self.screen):
+            return 'paused'
+
+    def menu_rendering5(self):
+        if self.play_button_game.draw(self.screen):
+            return 'resume'
+        if self.menu_button.draw(self.screen):
+            return 'options'
+        if self.to_main_button.draw(self.screen):
+            return 'menu'

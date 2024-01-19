@@ -83,6 +83,7 @@ if __name__ == '__main__':
     change_tab = 1
     btn_tab = 0
     level = level_creator('data/levels/level.txt')
+    menu = Menu(size, screen)
 
     score = 0
 
@@ -91,6 +92,14 @@ if __name__ == '__main__':
     running = True
 
     while running:
+        if change_tab == 5:
+            per.per_run_speed = 0
+            per.is_run = False
+            if per.is_jump:
+                per.is_jump = False
+            if per.is_reverse_jump:
+                per.is_reverse_jump = False
+
         if not (any((walls, obstacles, floors, coins))):
             if level != '':
                 with sqlite3.connect('game_data.db') as con:
@@ -127,16 +136,25 @@ if __name__ == '__main__':
             screen.blit(bg, (per.screen_x + 1600, 0))
         else:
             screen.blit(bg, (per.screen_x - 1600, 0))
-        walls.update(per)
-        floors.update(per)
-        obstacles.update(per)
-        coins.update(per, obstacles)
-        per.is_collide(walls, floors, obstacles, coins, floor)
+        if change_tab != 5:
+            walls.update(per)
+            floors.update(per)
+            obstacles.update(per)
+            coins.update(per, obstacles)
+            per.is_collide(walls, floors, obstacles, coins, floor)
         floors.draw(screen)
         walls.draw(screen)
         obstacles.draw(screen)
         coins.draw(screen)
         screen.blit(per.image, per.rect)
+        if change_tab == 5:
+            btn_tab = menu.menu_rendering5()
+            if btn_tab == 'resume':
+                per.per_run_speed = 10
+                per.is_run = True
+                change_tab = 4
+            if btn_tab == 'menu':
+                kill_all()
 
         if per.is_jump:
             per.if_is_jump()
@@ -147,21 +165,19 @@ if __name__ == '__main__':
         if per.is_run:
             per.if_is_run()
 
+        if change_tab == 4:
+            btn_tab = menu.menu_rendering4()
+
+        if btn_tab == 'paused':
+            change_tab = 5
+
         if game_menu:
-            menu = Menu(size, screen)
             if change_tab == 1:
                 btn_tab = menu.menu_rendering1()
             if change_tab == 2:
                 btn_tab = menu.menu_rendering2()
             if change_tab == 3:
                 btn_tab = menu.menu_rendering3()
-            if change_tab == 4:
-                btn_tab = menu.menu_rendering4()
-
-            if btn_tab == 1:
-                menu_tab = "main"
-                game_menu = False
-                block_hotkey = 1
 
             if btn_tab == 100:
                 running = False
@@ -179,26 +195,19 @@ if __name__ == '__main__':
                 level = level_creator('data/levels/level1.txt')
                 menu_tab = "main"
                 game_menu = False
+                change_tab = 4
                 block_hotkey = 1
             if btn_tab == 'lvl2_btn':
                 level = level_creator('data/levels/level2.txt')
                 menu_tab = "main"
                 game_menu = False
+                change_tab = 4
                 block_hotkey = 1
             if btn_tab == 'lvl3_btn':
                 level = level_creator('data/levels/level3.txt')
                 menu_tab = "main"
                 game_menu = False
-                block_hotkey = 1
-            if btn_tab == 'lvl4_btn':
-                level = level_creator('data/levels/level4.txt')
-                menu_tab = "main"
-                game_menu = False
-                block_hotkey = 1
-            if btn_tab == 'lvl5_btn':
-                level = level_creator('data/levels/level5.txt')
-                menu_tab = "main"
-                game_menu = False
+                change_tab = 4
                 block_hotkey = 1
 
         for event in pygame.event.get():
@@ -206,9 +215,7 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.KEYDOWN and block_hotkey == 1:
                 if event.key == pygame.K_ESCAPE:
-                    game_menu = True
-                    block_hotkey = 0
-                    kill_all()
+                    change_tab = 5
                 elif event.key == pygame.K_SPACE:
                     per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
