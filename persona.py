@@ -59,7 +59,7 @@ class Person(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.pos)
 
     def jump(self):
-        pygame.time.wait(15)
+        pygame.time.wait(10)
         if self.flip:
             if self.jump_count > 0:
                 self.pos = self.pos[0], self.pos[1] - (self.jump_count ** 2) / 6
@@ -104,7 +104,6 @@ class Person(pygame.sprite.Sprite):
     def wall_collide(self, other, left, right):
         if self.on_the_wall:
             if not self.rect.colliderect(self.floor_rect):
-                pygame.time.wait(20)
                 self.pos = self.pos[0], self.pos[1] + 0.5
                 self.rect = self.image.get_rect(center=self.pos)
         else:
