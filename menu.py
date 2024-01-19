@@ -18,7 +18,8 @@ class Menu:
 
         self.levels_image = pygame.image.load('data/buttons/levels.png').convert_alpha()
         self.audio_image = pygame.image.load('data/buttons/play.png').convert_alpha()
-        self.back_image = pygame.image.load('data/buttons/back.png').convert_alpha()
+        self.back_image = pygame.image.load('data/buttons/back.png')
+        self.back_image.set_colorkey(self.back_image.get_at((0, 0)))
 
         self.play_button = button.Button(size[0] / 2 - 222, 50, self.play_image, 2)
         self.levels_button = button.Button(size[0] / 2 - 222, 300, self.levels_image, 2)
@@ -26,18 +27,19 @@ class Menu:
         self.quit_button = button.Button(0, size[1] - 108, self.quit_image, 1)
 
         self.audio_button = button.Button(size[0] / 2 - 222, 300, self.audio_image, 2)
-        self.back_button = button.Button(size[0] / 2 - 135, 550, self.back_image, 2)
+        self.back_button = button.Button(size[0] / 2 - 163, 550, self.back_image, 1)
 
-        self.lvl1_img = pygame.image.load("data/buttons/1a.png").convert_alpha()
-        self.lvl1_btn = button.Button(25, 25, self.lvl1_img, 1)
-        self.lvl2_img = pygame.image.load("data/buttons/2a.png").convert_alpha()
-        self.lvl2_btn = button.Button(150, 25, self.lvl2_img, 1)
-        self.lvl3_img = pygame.image.load("data/buttons/3a.png").convert_alpha()
-        self.lvl3_btn = button.Button(275, 25, self.lvl3_img, 1)
-        self.lvl4_img = pygame.image.load("data/buttons/4a.png").convert_alpha()
-        self.lvl4_btn = button.Button(400, 25, self.lvl4_img, 1)
-        self.lvl5_img = pygame.image.load("data/buttons/5a.png").convert_alpha()
-        self.lvl5_btn = button.Button(525, 25, self.lvl5_img, 1)
+        self.lvl1_img = pygame.image.load("data/buttons/1a.png")
+        self.lvl1_img.set_colorkey(self.lvl1_img.get_at((0, 0)))
+        self.lvl1_btn = button.Button(535, 25, self.lvl1_img, 0.75)
+
+        self.lvl2_img = pygame.image.load("data/buttons/2a.png")
+        self.lvl2_img.set_colorkey(self.lvl2_img.get_at((0, 0)))
+        self.lvl2_btn = button.Button(671, 25, self.lvl2_img, 0.75)
+
+        self.lvl3_img = pygame.image.load("data/buttons/3a.png")
+        self.lvl3_img.set_colorkey(self.lvl3_img.get_at((0, 0)))
+        self.lvl3_btn = button.Button(882, 25, self.lvl3_img, 0.75)
 
     def menu_rendering1(self):
         if self.play_button.draw(self.screen):
@@ -62,9 +64,5 @@ class Menu:
             return 'lvl2_btn'
         if self.lvl3_btn.draw(self.screen):
             return 'lvl3_btn'
-        if self.lvl4_btn.draw(self.screen):
-            return 'lvl4_btn'
-        if self.lvl5_btn.draw(self.screen):
-            return 'lvl5_btn'
         if self.back_button.draw(self.screen):
             return 101
