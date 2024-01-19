@@ -91,6 +91,7 @@ if __name__ == '__main__':
     running = True
 
     while running:
+        events = pygame.event.get()
         if change_tab == 'pause':
             per.per_run_speed = 0
             per.is_run = False
@@ -191,7 +192,12 @@ if __name__ == '__main__':
             if change_tab == 'main':
                 btn_tab = menu.menu_rendering1()
             if change_tab == 'options':
-                btn_tab = menu.menu_rendering2()
+                btn_tab = menu.options_menu_rendering2(events)
+                if btn_tab != 101:
+                    vol = btn_tab[0] / 100
+                    pygame.mixer.music.set_volume(vol)
+                    for sound in sounds:
+                        sound.set_volume(btn_tab[1] / 100)
             if change_tab == 'levels':
                 btn_tab = menu.menu_rendering3()
 
@@ -226,7 +232,7 @@ if __name__ == '__main__':
                 change_tab = 'game'
                 block_hotkey = 1
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN and block_hotkey == 1:
