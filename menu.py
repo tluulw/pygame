@@ -78,8 +78,6 @@ class Menu:
 
         self.quit_button = button.Button(0, size[1] - 102, self.quit_image, 0.5)
 
-        self.audio_button = button.Button(size[0] / 2 - 222, 300, self.audio_image, 2)
-
         self.back_button = button.Button(size[0] / 2 - 163, 550, self.back_image, 0.5)
 
         self.lvl1_img = pygame.image.load("data/buttons/1a.png")
@@ -102,7 +100,7 @@ class Menu:
         if self.quit_button.draw(self.screen):
             return 'quit'
 
-    def menu_rendering2(self):
+    def menu_rendering2(self, events):
         if self.back_button.draw(self.screen):
             return 'back'
         self.music_text_edit.setText(self.music_slider.getValue())
