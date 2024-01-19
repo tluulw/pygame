@@ -15,8 +15,13 @@ class Coin(pygame.sprite.Sprite):
                                 self.image.get_height())
 
         self.animation_cnt = 1
+        self.coin_collected_sound = pygame.mixer.Sound("data/coin_collected.mp3")
+        self.coin_collected_sound.set_volume(0.2)
 
-    def update(self, per):
+    def update(self, per, obs):
+        for o in obs:
+            if self.rect.colliderect(o.rect):
+                self.kill()
         self.animation_cnt %= 9
         self.animation_cnt += 1
         self.image = pygame.image.load(f'data/coins/coin{self.animation_cnt}.png')
@@ -31,4 +36,6 @@ class Coin(pygame.sprite.Sprite):
                                     self.pos[1] - self.image.get_height(), self.image.get_width(),
                                     self.image.get_height())
         if per.rect.colliderect(self.rect):
+            per.coins_collected += 1
+            self.coin_collected_sound.play()
             self.kill()

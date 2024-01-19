@@ -29,6 +29,8 @@ class Person(pygame.sprite.Sprite):
         self.on_the_floor = False
         self.floor_rect = pygame.Rect(0, 0, 0, 0)
 
+        self.coins_collected = 0
+
         self.default_image()
 
     def jump_animation(self):
@@ -179,7 +181,7 @@ class Person(pygame.sprite.Sprite):
             self.floor_rect = other
             self.on_the_floor = True
 
-    def is_collide(self, walls, floors, obstacles, floor):
+    def is_collide(self, walls, floors, obstacles, coins, floor):
         if not pygame.sprite.spritecollideany(self, walls):
             self.on_the_wall = False
         if not pygame.sprite.spritecollideany(self, floors):
@@ -207,4 +209,6 @@ class Person(pygame.sprite.Sprite):
                 for sprite in floors:
                     sprite.kill()
                 for sprite in obstacles:
+                    sprite.kill()
+                for sprite in coins:
                     sprite.kill()

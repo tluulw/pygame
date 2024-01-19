@@ -59,22 +59,24 @@ if __name__ == '__main__':
                             Spike(cnt, i.find(x), False, 0, True, obstacles)
                         i = i.replace(x, '.', 1)
                 cnt += 1
-        return Person(0)
+        return level_name
 
 
-    per = level_creator('data/levels/level.txt')
+    per = Person(0)
 
     game_menu = True
     menu_tab = "main"
     block_hotkey = 0
     change_tab = 1
     btn_tab = 0
+    level = ''
 
     floor = pygame.Rect(0, 895, 1600, 5)
 
     running = True
 
     while running:
+        print(per.screen_x)
         if per.rect.colliderect(floor):
             per.floor_rect = floor
             per.on_the_floor = True
@@ -93,8 +95,8 @@ if __name__ == '__main__':
         walls.update(per)
         floors.update(per)
         obstacles.update(per)
-        coins.update(per)
-        per.is_collide(walls, floors, obstacles, floor)
+        coins.update(per, obstacles)
+        per.is_collide(walls, floors, obstacles, coins, floor)
         floors.draw(screen)
         walls.draw(screen)
         obstacles.draw(screen)
@@ -110,12 +112,14 @@ if __name__ == '__main__':
         if per.is_run:
             per.if_is_run()
 
-        if not (any((walls, obstacles, floors))):
+        if not (any((walls, obstacles, floors, coins))):
+            print(level)
+            print(per.coins_collected)
             game_menu = True
             block_hotkey = 0
             change_tab = 1
             btn_tab = 0
-            level_creator('data/levels/level.txt')
+            level = level_creator('data/levels/level.txt')
 
         if game_menu:
             menu = Menu(size, screen)
@@ -143,27 +147,27 @@ if __name__ == '__main__':
                 change_tab = 3
 
             if btn_tab == 'lvl1_btn':
-                level_creator('data/levels/level1.txt')
+                level = level_creator('data/levels/level1.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl2_btn':
-                level_creator('data/levels/level2.txt')
+                level = level_creator('data/levels/level2.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl3_btn':
-                level_creator('data/levels/level3.txt')
+                level = level_creator('data/levels/level3.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl4_btn':
-                level_creator('data/levels/level4.txt')
+                level = level_creator('data/levels/level4.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
             if btn_tab == 'lvl5_btn':
-                level_creator('data/levels/level5.txt')
+                level = level_creator('data/levels/level5.txt')
                 menu_tab = "main"
                 game_menu = False
                 block_hotkey = 1
@@ -180,6 +184,8 @@ if __name__ == '__main__':
                     for sprite in floors:
                         sprite.kill()
                     for sprite in obstacles:
+                        sprite.kill()
+                    for sprite in coins:
                         sprite.kill()
                 elif event.key == pygame.K_SPACE:
                     per.b_d = True
