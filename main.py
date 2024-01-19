@@ -194,7 +194,7 @@ if __name__ == '__main__':
             if change_tab == 'main':
                 btn_tab = menu.menu_rendering1()
             if change_tab == 'options':
-                btn_tab = menu.options_menu_rendering2(events)
+                btn_tab = menu.menu_rendering2(events)
                 if btn_tab != 'back':
                     vol = btn_tab[0] / 100
                     pygame.mixer.music.set_volume(vol)
