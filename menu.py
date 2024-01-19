@@ -1,5 +1,7 @@
 import pygame
-
+import pygame_widgets
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
 import button
 
 
@@ -46,7 +48,13 @@ class Menu:
         self.quit_image = pygame.image.load("data/buttons/stop.png")
         self.quit_image.set_colorkey(self.quit_image.get_at((0, 0)))
 
-        self.audio_image = pygame.image.load('data/buttons/play.png').convert_alpha()
+        self.music_slider = Slider(screen, size[0] / 2 - 400, 50, 800, 40, min=0, max=100, step=1)
+        self.music_text_edit = TextBox(screen, size[0] / 2 - 50, 150, 100, 50, fontSize=30)
+        self.music_text_edit.disable()
+
+        self.sound_slider = Slider(screen, size[0] / 2 - 400, 300, 800, 40, min=0, max=100, step=1)
+        self.sound_text_edit = TextBox(screen, size[0] / 2 - 50, 400, 100, 50, fontSize=30)
+        self.sound_text_edit.disable()
 
         self.back_image = pygame.image.load('data/buttons/back.png')
         self.back_image.set_colorkey(self.back_image.get_at((0, 0)))
@@ -95,10 +103,12 @@ class Menu:
             return 'quit'
 
     def menu_rendering2(self):
-        if self.audio_button.draw(self.screen):
-            return 4
         if self.back_button.draw(self.screen):
             return 'back'
+        self.music_text_edit.setText(self.music_slider.getValue())
+        self.sound_text_edit.setText(self.sound_slider.getValue())
+        pygame_widgets.update(events)
+        return self.music_slider.getValue(), self.sound_slider.getValue()
 
     def menu_rendering3(self):
         if self.lvl1_btn.draw(self.screen):
