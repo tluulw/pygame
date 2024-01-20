@@ -113,7 +113,7 @@ class Menu:
         self.lvl3_img.set_colorkey(self.lvl3_img.get_at((0, 0)))
         self.lvl3_btn = button.Button(882, 25, self.lvl3_img, 0.75)
 
-    def menu_rendering1(self):
+    def main_menu_rendering1(self):
         if self.play_button.draw(self.screen):
             return 'levels'
         if self.options_button.draw(self.screen):
@@ -121,7 +121,7 @@ class Menu:
         if self.quit_button.draw(self.screen):
             return 'quit'
 
-    def menu_rendering2(self, events):
+    def options_menu_rendering2(self, events):
         if self.back_button.draw(self.screen):
             return 'back'
         self.music_text_edit.setText(self.music_slider.getValue())
@@ -129,7 +129,7 @@ class Menu:
         pygame_widgets.update(events)
         return self.music_slider.getValue(), self.sound_slider.getValue()
 
-    def menu_rendering3(self):
+    def play_menu_rendering3(self):
         if self.lvl1_btn.draw(self.screen):
             return 'lvl1_btn'
         if self.lvl2_btn.draw(self.screen):
