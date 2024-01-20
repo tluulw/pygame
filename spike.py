@@ -39,5 +39,6 @@ class Spike(pygame.sprite.Sprite):
             self.pos = self.pos[0] + per.per_run_speed, self.pos[1]
         else:
             self.pos = self.pos[0] - per.per_run_speed, self.pos[1]
-        self.animate()
+        if 0 < self.pos[0] < 1600:
+            self.animate()
         self.rect = pygame.Rect(self.pos[0], self.pos[1], self.rect[2], self.rect[3])

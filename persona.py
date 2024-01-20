@@ -256,9 +256,14 @@ class Person(pygame.sprite.Sprite):
             elif self.rect.colliderect(el.right_border):
                 self.per_run_speed = 0
                 self.wall_collide(el.right_border, False, True)
+            elif self.rect.colliderect(el.top_border):
+                self.floor_collide(el.top_border)
         for el in floors:
             if self.rect.colliderect(el.top_border):
                 self.floor_collide(el.top_border)
         for el in obstacles:
             if self.rect.colliderect(el.rect):
                 self.kill_all(walls, floors, obstacles, coins)
+
+    def person_swap(self, person):
+        self.person = person

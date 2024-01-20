@@ -22,11 +22,12 @@ class Coin(pygame.sprite.Sprite):
         for o in obs:
             if self.rect.colliderect(o.rect):
                 self.kill()
-        self.animation_cnt %= 9
-        self.animation_cnt += 1
-        self.image = pygame.image.load(f'data/coins/coin{self.animation_cnt}.png')
-        self.image = pygame.transform.scale2x(self.image)
-        self.image.set_colorkey(self.image.get_at((0, 0)))
+        if 0 < self.rect[0] < 1600:
+            self.animation_cnt %= 9
+            self.animation_cnt += 1
+            self.image = pygame.image.load(f'data/coins/coin{self.animation_cnt}.png')
+            self.image = pygame.transform.scale2x(self.image)
+            self.image.set_colorkey(self.image.get_at((0, 0)))
         if per.flip:
             self.rect = pygame.Rect(self.rect[0] + per.per_run_speed,
                                     self.pos[1] - self.image.get_height(), self.image.get_width(),
