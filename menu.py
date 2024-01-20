@@ -12,6 +12,7 @@ class Menu:
         self.menu_state = "main"
 
         self.font = pygame.font.Font("data/ARCADEPI.TTF", 100)
+        self.small_font = pygame.font.Font("data/ARCADEPI.TTF", 50)
 
         self.TEXT_COL = (255, 215, 0)
 
@@ -63,6 +64,26 @@ class Menu:
         self.pause_image.set_colorkey(self.pause_image.get_at((0, 0)))
 
         self.pause_button = button.Button(0, 0, self.pause_image, 0.5)
+
+        self.coins_now = self.small_font.render('COINS:', False, self.TEXT_COL)
+        self.coins_now_rect = (
+            1450 - self.coins_now.get_width(), 100, self.coins_now.get_width(),
+            self.coins_now.get_height())
+
+        self.score_now = self.small_font.render('SCORE:', False, self.TEXT_COL)
+        self.score_now_rect = (
+            1450 - self.score_now.get_width(), 0, self.score_now.get_width(),
+            self.score_now.get_height())
+
+        self.coins_now_cnt = self.small_font.render('', False, self.TEXT_COL)
+        self.coins_now_cnt_rect = (
+            1600 - self.coins_now_cnt.get_width(), 100, self.coins_now_cnt.get_width(),
+            self.coins_now_cnt.get_height())
+
+        self.score_now_cnt = self.small_font.render('', False, self.TEXT_COL)
+        self.score_now_cnt_rect = (
+            1600 - self.score_now_cnt.get_width(), 0, self.score_now_cnt.get_width(),
+            self.score_now_cnt.get_height())
 
         self.play_button = button.Button(size[0] / 2 - 250, 300, self.play_image, 1)
 
@@ -118,9 +139,24 @@ class Menu:
         if self.back_button.draw(self.screen):
             return 'back'
 
-    def menu_rendering4(self):
+    def game_rendering(self, coins, score):
         if self.pause_button.draw(self.screen):
             return 'paused'
+        self.screen.blit(self.coins_now, self.coins_now_rect)
+        self.screen.blit(self.score_now, self.score_now_rect)
+
+        self.coins_now_cnt = self.small_font.render(f'{coins}', False, self.TEXT_COL)
+        self.coins_now_cnt_rect = (
+            1600 - self.coins_now_cnt.get_width(), 100, self.coins_now_cnt.get_width(),
+            self.coins_now_cnt.get_height())
+
+        self.score_now_cnt = self.small_font.render(f'{score}', False, self.TEXT_COL)
+        self.score_now_cnt_rect = (
+            1600 - self.score_now_cnt.get_width(), 0, self.score_now_cnt.get_width(),
+            self.score_now_cnt.get_height())
+
+        self.screen.blit(self.coins_now_cnt, self.coins_now_cnt_rect)
+        self.screen.blit(self.score_now_cnt, self.score_now_cnt_rect)
 
     def pause_rendering(self):
         if self.play_button_game.draw(self.screen):

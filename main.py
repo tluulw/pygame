@@ -113,7 +113,8 @@ if __name__ == '__main__':
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
 
-        if round(per.screen_x) % 320 == 0 and level != '' and change_tab != 'game_over' and change_tab != 'main':
+        if (not (per.is_run and per.flip) or not per.is_reverse_jump) and round(
+                per.screen_x) % 320 == 0 and level != '' and not game_menu:
             score += 1
         if per.rect.colliderect(floor):
             per.floor_rect = floor
@@ -130,7 +131,7 @@ if __name__ == '__main__':
             screen.blit(bg, (per.screen_x + 1600, 0))
         else:
             screen.blit(bg, (per.screen_x - 1600, 0))
-        if change_tab != 'pause':
+        if change_tab != 'pause' and change_tab != 'options':
             walls.update(per)
             floors.update(per)
             obstacles.update(per)
@@ -150,8 +151,22 @@ if __name__ == '__main__':
             if btn_tab == 'menu':
                 kill_all()
                 level = level_creator('data/levels/level.txt')
+                per.per_run_speed = 10
+                per.is_run = True
                 change_tab = 'main'
                 game_menu = True
+            if btn_tab == 'options':
+                change_tab = 'options'
+
+        if change_tab == 'options':
+            btn_tab = menu.menu_rendering2(events)
+            if btn_tab != 'back':
+                vol = btn_tab[0] / 100
+                pygame.mixer.music.set_volume(vol)
+                for sound in sounds:
+                    sound.set_volume(btn_tab[1] / 100)
+            else:
+                change_tab = 'pause'
 
         if per.is_jump:
             per.if_is_jump()
@@ -163,7 +178,7 @@ if __name__ == '__main__':
             per.if_is_run()
 
         if change_tab == 'game':
-            btn_tab = menu.menu_rendering4()
+            btn_tab = menu.game_rendering(per.coins_collected, score)
 
         if btn_tab == 'paused':
             change_tab = 'pause'
@@ -192,6 +207,7 @@ if __name__ == '__main__':
 
         if game_menu:
             if change_tab == 'main':
+                per.flip = False
                 btn_tab = menu.menu_rendering1()
             if change_tab == 'options':
                 btn_tab = menu.menu_rendering2(events)
