@@ -90,6 +90,8 @@ if __name__ == '__main__':
 
     floor = pygame.Rect(0, 895, 1600, 5)
 
+    s = 0
+
     running = True
 
     while running:
@@ -112,6 +114,14 @@ if __name__ == '__main__':
                     con.commit()
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
+
+        if per.flip and s == 0:
+            s = round(per.screen_x)
+        if str(round(per.screen_x))[-1] != '0' and not per.flip and round(per.screen_x) < s:
+            s = 0
+            per.screen_x = int(str(round(per.screen_x - per.per_run_speed))[:-1]) * 10
+        if not per.flip and round(per.screen_x) % 320 == 0 and level != '' and not game_menu:
+            score += 1
 
         if (not (per.is_run and per.flip) or not per.is_reverse_jump) and round(
                 per.screen_x) % 320 == 0 and level != '' and not game_menu:
