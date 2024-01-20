@@ -159,7 +159,7 @@ if __name__ == '__main__':
                 change_tab = 'options'
 
         if change_tab == 'options':
-            btn_tab = menu.menu_rendering2(events)
+            btn_tab = menu.options_menu_rendering2(events)
             if btn_tab != 'back':
                 vol = btn_tab[0] / 100
                 pygame.mixer.music.set_volume(vol)
@@ -208,16 +208,16 @@ if __name__ == '__main__':
         if game_menu:
             if change_tab == 'main':
                 per.flip = False
-                btn_tab = menu.menu_rendering1()
+                btn_tab = menu.main_menu_rendering1()
             if change_tab == 'options':
-                btn_tab = menu.menu_rendering2(events)
+                btn_tab = menu.options_menu_rendering2(events)
                 if btn_tab != 'back':
                     vol = btn_tab[0] / 100
                     pygame.mixer.music.set_volume(vol)
                     for sound in sounds:
                         sound.set_volume(btn_tab[1] / 100)
             if change_tab == 'levels':
-                btn_tab = menu.menu_rendering3()
+                btn_tab = menu.play_menu_rendering3()
 
             if btn_tab == 'quit':
                 running = False
