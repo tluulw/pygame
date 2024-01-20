@@ -77,7 +77,7 @@ if __name__ == '__main__':
             sprite.kill()
 
 
-    per = Person(0, 'samurai', screen)
+    per = Person(0, 'hero', screen)
 
     game_menu = True
     block_hotkey = 0
@@ -88,9 +88,11 @@ if __name__ == '__main__':
 
     score = 0
 
-    floor = pygame.Rect(0, 895, 1600, 5)
+    j_s = 0
+    j_e = 0
 
-    s = 0
+    floor = pygame.Rect(0, 895, 1600, 5)
+    screen_y = 0
 
     running = True
 
@@ -114,21 +116,17 @@ if __name__ == '__main__':
                     con.commit()
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
-
-        if per.flip and s == 0:
-            s = round(per.screen_x)
-        if str(round(per.screen_x))[-1] != '0' and not per.flip and round(per.screen_x) < s:
-            s = 0
-            per.screen_x = int(str(round(per.screen_x - per.per_run_speed))[:-1]) * 10
-        if not per.flip and round(per.screen_x) % 320 == 0 and level != '' and not game_menu:
+        if not per.flip and j_s - j_e > 320:
             score += 1
-
-        if (not (per.is_run and per.flip) or not per.is_reverse_jump) and round(
-                per.screen_x) % 320 == 0 and level != '' and not game_menu:
+            j_s = 0
+            j_e = 0
+        if not per.flip and round(per.screen_x) % 320 == 0 and level != '' and not game_menu:
             score += 1
         if per.rect.colliderect(floor):
             per.floor_rect = floor
             per.on_the_floor = True
+        elif per.pos[1] >= 400 + 12:
+            per.pos = per.pos[0], per.pos[1]
         if per.on_the_floor:
             if per.pos[0] <= 800 - 12:
                 per.pos = per.pos[0] + 12, per.pos[1]
@@ -136,9 +134,9 @@ if __name__ == '__main__':
                 per.pos = per.pos[0] - 12, per.pos[1]
         if -1600 >= per.screen_x or 1600 <= per.screen_x:
             per.screen_x = 0
-        screen.blit(bg, (per.screen_x, 0))
+        screen.blit(bg, (per.screen_x, screen_y))
         if per.screen_x < 0:
-            screen.blit(bg, (per.screen_x + 1600, 0))
+            screen.blit(bg, (per.screen_x + 1600, screen_y))
         else:
             screen.blit(bg, (per.screen_x - 1600, 0))
         if change_tab != 'pause' and change_tab != 'options':
@@ -272,6 +270,7 @@ if __name__ == '__main__':
                     elif change_tab == 'pause':
                         btn_tab = 'resume'
                 elif event.key == pygame.K_SPACE:
+                    j_s = per.screen_x
                     per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
                         per.jump_particle_cnt = 0
@@ -299,6 +298,7 @@ if __name__ == '__main__':
                     pygame.mixer.music.set_volume(vol)
             if event.type == pygame.KEYUP and block_hotkey == 1:
                 if event.key == pygame.K_SPACE:
+                    j_e = per.screen_x
                     per.b_d = False
         pygame.display.flip()
         clock.tick(60)
