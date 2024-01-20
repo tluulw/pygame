@@ -77,7 +77,7 @@ if __name__ == '__main__':
             sprite.kill()
 
 
-    per = Person(0, 'hero', screen)
+    per = Person(0, 'samurai', screen)
 
     game_menu = True
     block_hotkey = 0
@@ -88,11 +88,7 @@ if __name__ == '__main__':
 
     score = 0
 
-    j_s = 0
-    j_e = 0
-
     floor = pygame.Rect(0, 895, 1600, 5)
-    screen_y = 0
 
     running = True
 
@@ -116,17 +112,13 @@ if __name__ == '__main__':
                     con.commit()
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
-        if not per.flip and j_s - j_e > 320:
-            score += 1
-            j_s = 0
-            j_e = 0
-        if not per.flip and round(per.screen_x) % 320 == 0 and level != '' and not game_menu:
+
+        if (not (per.is_run and per.flip) or not per.is_reverse_jump) and round(
+                per.screen_x) % 320 == 0 and level != '' and not game_menu:
             score += 1
         if per.rect.colliderect(floor):
             per.floor_rect = floor
             per.on_the_floor = True
-        elif per.pos[1] >= 400 + 12:
-            per.pos = per.pos[0], per.pos[1]
         if per.on_the_floor:
             if per.pos[0] <= 800 - 12:
                 per.pos = per.pos[0] + 12, per.pos[1]
@@ -134,9 +126,9 @@ if __name__ == '__main__':
                 per.pos = per.pos[0] - 12, per.pos[1]
         if -1600 >= per.screen_x or 1600 <= per.screen_x:
             per.screen_x = 0
-        screen.blit(bg, (per.screen_x, screen_y))
+        screen.blit(bg, (per.screen_x, 0))
         if per.screen_x < 0:
-            screen.blit(bg, (per.screen_x + 1600, screen_y))
+            screen.blit(bg, (per.screen_x + 1600, 0))
         else:
             screen.blit(bg, (per.screen_x - 1600, 0))
         if change_tab != 'pause' and change_tab != 'options':
@@ -214,21 +206,6 @@ if __name__ == '__main__':
             per.coins_collected = 0
 
         if game_menu:
-            if change_tab == 'main':
-                score = 0
-                per.coins_collected = 0
-                per.flip = False
-                btn_tab = menu.main_menu_rendering1()
-            if change_tab == 'options':
-                btn_tab = menu.options_menu_rendering2(events)
-                if btn_tab != 'back':
-                    vol = btn_tab[0] / 100
-                    pygame.mixer.music.set_volume(vol)
-                    for sound in sounds:
-                        sound.set_volume(btn_tab[1] / 100)
-            if change_tab == 'levels':
-                btn_tab = menu.play_menu_rendering3()
-
             if btn_tab == 'quit':
                 running = False
 
@@ -238,8 +215,17 @@ if __name__ == '__main__':
             if btn_tab == 'back':
                 change_tab = 'main'
 
+            if btn_tab == 'heroes':
+                change_tab = 'heroes'
+
             if btn_tab == 'levels':
                 change_tab = 'levels'
+
+            if btn_tab == 'per_default':
+                per = Person(0, 'hero', screen)
+
+            if btn_tab == 'per_samurai':
+                per = Person(0, 'samurai', screen)
 
             if btn_tab == 'lvl1_btn':
                 level = level_creator('data/levels/level1.txt')
@@ -260,6 +246,25 @@ if __name__ == '__main__':
                 change_tab = 'game'
                 block_hotkey = 1
 
+            if change_tab == 'main':
+                score = 0
+                per.coins_collected = 0
+                per.flip = False
+                btn_tab = menu.main_menu_rendering1()
+            if change_tab == 'options':
+                btn_tab = menu.options_menu_rendering2(events)
+                if btn_tab != 'back':
+                    vol = btn_tab[0] / 100
+                    pygame.mixer.music.set_volume(vol)
+                    for sound in sounds:
+                        sound.set_volume(btn_tab[1] / 100)
+                if btn_tab == 'back':
+                    change_tab = 'main'
+            if change_tab == 'levels':
+                btn_tab = menu.play_menu_rendering3()
+            if change_tab == 'heroes':
+                btn_tab = menu.heroes_menu_rendering4()
+
         for event in events:
             if event.type == pygame.QUIT:
                 running = False
@@ -270,7 +275,6 @@ if __name__ == '__main__':
                     elif change_tab == 'pause':
                         btn_tab = 'resume'
                 elif event.key == pygame.K_SPACE:
-                    j_s = per.screen_x
                     per.b_d = True
                     if not per.is_jump and not per.is_reverse_jump:
                         per.jump_particle_cnt = 0
@@ -298,7 +302,6 @@ if __name__ == '__main__':
                     pygame.mixer.music.set_volume(vol)
             if event.type == pygame.KEYUP and block_hotkey == 1:
                 if event.key == pygame.K_SPACE:
-                    j_e = per.screen_x
                     per.b_d = False
         pygame.display.flip()
         clock.tick(60)

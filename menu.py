@@ -49,6 +49,9 @@ class Menu:
         self.quit_image = pygame.image.load("data/buttons/stop.png")
         self.quit_image.set_colorkey(self.quit_image.get_at((0, 0)))
 
+        self.heroes_image = pygame.image.load("data/buttons/heroes.png")
+        self.heroes_image.set_colorkey(self.heroes_image.get_at((0, 0)))
+
         self.music_slider = Slider(screen, size[0] / 2 - 400, 50, 800, 40, min=0, max=100, step=1)
         self.music_text_edit = TextBox(screen, size[0] / 2 - 50, 150, 100, 50, fontSize=30)
         self.music_text_edit.disable()
@@ -91,15 +94,17 @@ class Menu:
 
         self.menu_button = button.Button(size[0] / 2 - 125, 400, self.options_image, 0.5)
 
-        self.to_main_button = button.Button(size[0] / 2 - 125, 500, self.back_image, 0.38)
+        self.to_main_button = button.Button(size[0] / 2 - 125, 675, self.back_image, 0.38)
 
-        self.main_button = button.Button(size[0] / 2 - 125, 500, self.back_image, 0.38)
+        self.main_button = button.Button(size[0] / 2 - 125, 675, self.back_image, 0.38)
 
         self.options_button = button.Button(size[0] - 250, size[1] - 79, self.options_image, 0.5)
 
         self.quit_button = button.Button(0, size[1] - 102, self.quit_image, 0.5)
 
-        self.back_button = button.Button(size[0] / 2 - 163, 550, self.back_image, 0.5)
+        self.heroes_button = button.Button(size[0] / 2 - 187.5, 500, self.heroes_image, 0.75)
+
+        self.back_button = button.Button(size[0] / 2 - 163, 675, self.back_image, 0.5)
 
         self.lvl1_img = pygame.image.load("data/buttons/1a.png")
         self.lvl1_img.set_colorkey(self.lvl1_img.get_at((0, 0)))
@@ -113,11 +118,21 @@ class Menu:
         self.lvl3_img.set_colorkey(self.lvl3_img.get_at((0, 0)))
         self.lvl3_btn = button.Button(882, 25, self.lvl3_img, 0.75)
 
+        self.hero_default_img = pygame.image.load("data/hero/pic.png")
+        self.hero_default_img.set_colorkey(self.hero_default_img.get_at((0, 0)))
+        self.hero_default_btn = button.Button(400, 50, self.hero_default_img, 2)
+
+        self.hero_samurai_img = pygame.image.load("data/samurai/pic.png")
+        self.hero_samurai_img.set_colorkey(self.hero_default_img.get_at((0, 0)))
+        self.hero_samurai_btn = button.Button(510, 50, self.hero_samurai_img, 2)
+
     def main_menu_rendering1(self):
         if self.play_button.draw(self.screen):
             return 'levels'
         if self.options_button.draw(self.screen):
             return 'options'
+        if self.heroes_button.draw(self.screen):
+            return 'heroes'
         if self.quit_button.draw(self.screen):
             return 'quit'
 
@@ -136,6 +151,14 @@ class Menu:
             return 'lvl2_btn'
         if self.lvl3_btn.draw(self.screen):
             return 'lvl3_btn'
+        if self.back_button.draw(self.screen):
+            return 'back'
+
+    def heroes_menu_rendering4(self):
+        if self.hero_default_btn.draw(self.screen):
+            return 'per_default'
+        if self.hero_samurai_btn.draw(self.screen):
+            return 'per_samurai'
         if self.back_button.draw(self.screen):
             return 'back'
 
@@ -176,16 +199,16 @@ class Menu:
         self.score = self.font.render(f'{score}', False, self.TEXT_COL)
 
         self.score_rect = (
-        800 + self.your_score.get_width() / 2, 250, self.score.get_width(),
-        self.score.get_height())
+            800 + self.your_score.get_width() / 2, 250, self.score.get_width(),
+            self.score.get_height())
 
         self.screen.blit(self.score, self.score_rect)
 
         self.coins = self.font.render(f'{coins}', False, self.TEXT_COL)
 
         self.coins_rect = (
-        800 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
-        self.coins.get_height())
+            800 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
+            self.coins.get_height())
 
         self.screen.blit(self.coins, self.coins_rect)
 
