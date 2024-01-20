@@ -207,6 +207,8 @@ if __name__ == '__main__':
 
         if game_menu:
             if change_tab == 'main':
+                score = 0
+                per.coins_collected = 0
                 per.flip = False
                 btn_tab = menu.main_menu_rendering1()
             if change_tab == 'options':
