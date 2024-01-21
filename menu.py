@@ -16,26 +16,50 @@ class Menu:
 
         self.TEXT_COL = (255, 215, 0)
 
-        self.game_over = self.font.render('GAME OVER!', False, self.TEXT_COL)
+        self.game_win = self.font.render('WIN!', False, self.TEXT_COL)
+        self.game_win_rect = (
+            size[0] / 2 - self.game_win.get_width() / 2, 100, self.game_win.get_width(), self.game_win.get_height())
+
+        self.your_score_win = self.font.render('YOUR SCORE:', False, self.TEXT_COL)
+        self.your_score_win_rect = (
+            size[0] / 2 - self.your_score_win.get_width() / 2, 250, self.your_score_win.get_width(),
+            self.your_score_win.get_height())
+
+        self.score_win = self.font.render('', False, self.TEXT_COL)
+        self.score_win_rect = (
+            size[0] / 2 + self.your_score_win.get_width() / 2, 250, self.score_win.get_width(),
+            self.score_win.get_height())
+
+        self.your_coins_win = self.font.render('YOUR COINS:', False, self.TEXT_COL)
+        self.your_coins_win_rect = (
+            size[0] / 2 - self.your_coins_win.get_width() / 2, 350, self.your_coins_win.get_width(),
+            self.your_coins_win.get_height())
+
+        self.coins_win = self.font.render('', False, self.TEXT_COL)
+        self.coins_rect_win = (
+            size[0] / 2 + self.your_coins_win.get_width() / 2, 350, self.coins_win.get_width(),
+            self.coins_win.get_height())
+
+        self.game_over = self.font.render('GAME OVER!', False, (255, 40, 0))
         self.game_over_rect = (
             size[0] / 2 - self.game_over.get_width() / 2, 100, self.game_over.get_width(), self.game_over.get_height())
 
-        self.your_score = self.font.render('YOUR SCORE:', False, self.TEXT_COL)
+        self.your_score = self.font.render('YOUR SCORE:', False, (255, 40, 0))
         self.your_score_rect = (
             size[0] / 2 - self.your_score.get_width() / 2, 250, self.your_score.get_width(),
             self.your_score.get_height())
 
-        self.score = self.font.render('', False, self.TEXT_COL)
+        self.score = self.font.render('', False, (255, 40, 0))
         self.score_rect = (
             size[0] / 2 + self.your_score.get_width() / 2, 250, self.score.get_width(),
             self.score.get_height())
 
-        self.your_coins = self.font.render('YOUR COINS:', False, self.TEXT_COL)
+        self.your_coins = self.font.render('YOUR COINS:', False, (255, 40, 0))
         self.your_coins_rect = (
             size[0] / 2 - self.your_coins.get_width() / 2, 350, self.your_coins.get_width(),
             self.your_coins.get_height())
 
-        self.coins = self.font.render('', False, self.TEXT_COL)
+        self.coins = self.font.render('', False, (255, 40, 0))
         self.coins_rect = (
             size[0] / 2 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
             self.coins.get_height())
@@ -228,7 +252,7 @@ class Menu:
 
         self.screen.blit(self.your_coins, self.your_coins_rect)
 
-        self.score = self.font.render(f'{score}', False, self.TEXT_COL)
+        self.score = self.font.render(f'{score}', False, (255, 40, 0))
 
         self.score_rect = (
         800 + self.your_score.get_width() / 2, 250, self.score.get_width(),
@@ -236,7 +260,7 @@ class Menu:
 
         self.screen.blit(self.score, self.score_rect)
 
-        self.coins = self.font.render(f'{coins}', False, self.TEXT_COL)
+        self.coins = self.font.render(f'{coins}', False, (255, 40, 0))
 
         self.coins_rect = (
         800 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
@@ -250,6 +274,31 @@ class Menu:
         if self.main_button.draw(self.screen):
             return 'main'
 
+    def game_win_rendering(self, score, coins):
+        self.screen.blit(self.game_win, self.game_win_rect)
+
+        self.screen.blit(self.your_score_win, self.your_score_win_rect)
+
+        self.screen.blit(self.your_coins_win, self.your_coins_win_rect)
+
+        self.score_win = self.font.render(f'{score}', False, self.TEXT_COL)
+
+        self.score_rect = (
+            800 + self.your_score_win.get_width() / 2, 250, self.score_win.get_width(),
+            self.score_win.get_height())
+
+        self.screen.blit(self.score_win, self.score_win_rect)
+
+        self.coins_win = self.font.render(f'{coins}', False, self.TEXT_COL)
+
+        self.coins_rect = (
+            800 + self.your_coins_win.get_width() / 2, 350, self.coins_win.get_width(),
+            self.coins_win.get_height())
+
+        self.screen.blit(self.coins_win, self.coins_rect)
+
+        if self.main_button.draw(self.screen):
+            return 'main'
     def select_rendering(self, hero):
         if self.left_arrow.draw(self.screen):
             return 'left'

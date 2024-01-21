@@ -8,6 +8,7 @@ from menu import Menu
 from persona import Person
 from spike import Spike
 from wall import Wall
+from win_flag import WinFlag
 
 if __name__ == '__main__':
     pygame.init()
@@ -23,6 +24,7 @@ if __name__ == '__main__':
     floors = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
     coins = pygame.sprite.Group()
+    win_flag = pygame.sprite.Group()
 
     jump_sound = pygame.mixer.Sound("data/action_jump.mp3")
     pygame.mixer.music.load("data/bg_music.mp3")
@@ -43,10 +45,11 @@ if __name__ == '__main__':
             sprite.kill()
         for sprite in coins:
             sprite.kill()
+        for sprite in win_flag:
+            sprite.kill()
 
 
     per = Person(0, 'hero', screen)
-
 
     def level_creator(level_name):
         cnt = 0
@@ -71,9 +74,11 @@ if __name__ == '__main__':
                         else:
                             Spike(cnt, i.find(x), False, 0, True, obstacles)
                         i = i.replace(x, '.', 1)
+                    if x == 'w':
+                        WinFlag(cnt, i.find(x), win_flag)
+                        i = i.replace(x, '.', 1)
                 cnt += 1
         return level_name
-
 
     game_menu = True
     block_hotkey = 0
@@ -104,7 +109,19 @@ if __name__ == '__main__':
             if per.is_reverse_jump:
                 per.is_reverse_jump = False
 
-        if not (any((walls, obstacles, floors, coins))):
+        if per.is_collide(walls, floors, obstacles, coins, floor, win_flag) == 'win':
+            if level != '':
+                with sqlite3.connect('game_data.db') as con:
+                    cur = con.cursor()
+                    cur.execute(
+                        f"""INSERT INTO results (level, coins, score) VALUES ('{level[17:][:1]}', 
+                        '{per.coins_collected}', '{score}')""")
+                    con.commit()
+                change_tab = 'game_win'
+                level = level_creator('data/levels/level.txt')
+
+        if (not (any((walls, obstacles, floors, coins, win_flag))) and
+                per.is_collide(walls, floors, obstacles, coins, floor, win_flag) != 'win'):
             if level != '':
                 with sqlite3.connect('game_data.db') as con:
                     cur = con.cursor()
@@ -148,13 +165,15 @@ if __name__ == '__main__':
             walls.update(per)
             floors.update(per)
             obstacles.update(per)
+            win_flag.update(per)
             coins.update(per, obstacles)
-            per.is_collide(walls, floors, obstacles, coins, floor)
+            per.is_collide(walls, floors, obstacles, coins, floor, win_flag)
 
         walls.draw(screen)
         floors.draw(screen)
         obstacles.draw(screen)
         coins.draw(screen)
+        win_flag.draw(screen)
         screen.blit(per.image, per.rect)
 
         if change_tab == 'pause':
@@ -214,6 +233,17 @@ if __name__ == '__main__':
                     f"""SELECT coins FROM results""").fetchall()
                 y_c = [int(el) for el in y_c[-1]]
             btn_tab = menu.game_over_rendering(y_s, y_c)
+
+        if change_tab == 'game_win':
+            with sqlite3.connect('game_data.db') as con:
+                cur = con.cursor()
+                y_s = cur.execute(
+                    f"""SELECT score FROM results""").fetchall()
+                y_s = [int(el) for el in y_s[-1]]
+                y_c = cur.execute(
+                    f"""SELECT coins FROM results""").fetchall()
+                y_c = [int(el) for el in y_c[-1]]
+            btn_tab = menu.game_win_rendering(y_s, y_c)
 
         if btn_tab == 'main':
             game_menu = True

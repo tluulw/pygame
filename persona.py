@@ -228,7 +228,7 @@ class Person(pygame.sprite.Sprite):
             self.floor_rect = other
             self.on_the_floor = True
 
-    def kill_all(self, walls, floors, obstacles, coins):
+    def kill_all(self, walls, floors, obstacles, coins, win_flag):
         for sprite in walls:
             sprite.kill()
         for sprite in floors:
@@ -237,8 +237,10 @@ class Person(pygame.sprite.Sprite):
             sprite.kill()
         for sprite in coins:
             sprite.kill()
+        for sprite in win_flag:
+            sprite.kill()
 
-    def is_collide(self, walls, floors, obstacles, coins, floor):
+    def is_collide(self, walls, floors, obstacles, coins, floor, win_flag):
         if not pygame.sprite.spritecollideany(self, walls):
             self.on_the_wall = False
         if not pygame.sprite.spritecollideany(self, floors):
@@ -263,7 +265,11 @@ class Person(pygame.sprite.Sprite):
                 self.floor_collide(el.top_border)
         for el in obstacles:
             if self.rect.colliderect(el.rect):
-                self.kill_all(walls, floors, obstacles, coins)
+                self.kill_all(walls, floors, obstacles, coins, win_flag)
+        for el in win_flag:
+            if self.rect.colliderect(el.rect):
+                self.kill_all(walls, floors, obstacles, coins, win_flag)
+                return 'win'
 
     def person_swap(self, person):
         self.person = person
