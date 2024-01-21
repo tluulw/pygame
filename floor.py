@@ -2,7 +2,7 @@ import pygame
 
 
 class Floor(pygame.sprite.Sprite):
-    def __init__(self, y, x, *group):
+    def __init__(self, y, x, finish, *group):
         super().__init__(*group)
         self.pos = x * 40, y * 180
 
@@ -13,6 +13,9 @@ class Floor(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.pos[0], self.pos[1], 200, 30)
 
         self.top_border = pygame.Rect(self.rect[0], self.rect[1] - 1, self.rect[2], 1)
+        self.bottom_border = pygame.Rect(self.rect[0], self.rect[1] + 30, self.rect[2], 1)
+
+        self.finish = finish
 
     def update(self, per):
         if per.flip:
@@ -21,3 +24,4 @@ class Floor(pygame.sprite.Sprite):
             self.pos = self.pos[0] - per.per_run_speed, self.pos[1]
         self.rect = pygame.Rect(self.pos[0], self.pos[1], 200, 30)
         self.top_border = pygame.Rect(self.rect[0], self.rect[1] - 1, self.rect[2], 1)
+        self.bottom_border = pygame.Rect(self.rect[0], self.rect[1] + 30, self.rect[2], 1)

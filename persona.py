@@ -253,16 +253,28 @@ class Person(pygame.sprite.Sprite):
             self.jump_landing()
         for el in walls:
             if self.rect.colliderect(el.left_border):
-                self.per_run_speed = 0
-                self.wall_collide(el.left_border, True, False)
+                if not self.on_the_floor:
+                    self.per_run_speed = 0
+                    self.wall_collide(el.left_border, True, False)
+                else:
+                    self.flip = not self.flip
             elif self.rect.colliderect(el.right_border):
-                self.per_run_speed = 0
-                self.wall_collide(el.right_border, False, True)
+                if not self.on_the_floor:
+                    self.per_run_speed = 0
+                    self.wall_collide(el.right_border, False, True)
+                else:
+                    self.flip = not self.flip
             elif self.rect.colliderect(el.top_border):
                 self.floor_collide(el.top_border)
         for el in floors:
             if self.rect.colliderect(el.top_border):
                 self.floor_collide(el.top_border)
+                if el.finish:
+                    self.kill_all(walls, floors, obstacles, coins)
+                    return True
+                return False
+            if self.rect.colliderect(el.bottom_border):
+                self.jump_landing()
         for el in obstacles:
             if self.rect.colliderect(el.rect):
                 self.kill_all(walls, floors, obstacles, coins, win_flag)

@@ -8,7 +8,6 @@ from menu import Menu
 from persona import Person
 from spike import Spike
 from wall import Wall
-from win_flag import WinFlag
 
 if __name__ == '__main__':
     pygame.init()
@@ -24,7 +23,6 @@ if __name__ == '__main__':
     floors = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
     coins = pygame.sprite.Group()
-    win_flag = pygame.sprite.Group()
 
     jump_sound = pygame.mixer.Sound("data/action_jump.mp3")
     pygame.mixer.music.load("data/bg_music.mp3")
@@ -45,11 +43,10 @@ if __name__ == '__main__':
             sprite.kill()
         for sprite in coins:
             sprite.kill()
-        for sprite in win_flag:
-            sprite.kill()
 
 
     per = Person(0, 'hero', screen)
+
 
     def level_creator(level_name):
         cnt = 0
@@ -63,7 +60,7 @@ if __name__ == '__main__':
                         i = i.replace(x, '.', 1)
                     if x == '_':
                         Coin(cnt, i.find(x), coins)
-                        Floor(cnt, i.find(x), floors)
+                        Floor(cnt, i.find(x), False, floors)
                         i = i.replace(x, '.', 1)
                     if x == '*':
                         if i[i.find(x) + 1] == '|':
@@ -74,11 +71,12 @@ if __name__ == '__main__':
                         else:
                             Spike(cnt, i.find(x), False, 0, True, obstacles)
                         i = i.replace(x, '.', 1)
-                    if x == 'w':
-                        WinFlag(cnt, i.find(x), win_flag)
+                    if x == '!':
+                        Floor(cnt, i.find(x), True, floors)
                         i = i.replace(x, '.', 1)
                 cnt += 1
         return level_name
+
 
     game_menu = True
     block_hotkey = 0
@@ -87,10 +85,7 @@ if __name__ == '__main__':
     level = level_creator('data/levels/level.txt')
     menu = Menu(size, screen)
 
-    score = 0
-
-    j_s = 0
-    j_e = 0
+    completed = False
 
     heroes = ['hero', 'samurai']
     hero_cnt = 0
@@ -109,40 +104,28 @@ if __name__ == '__main__':
             if per.is_reverse_jump:
                 per.is_reverse_jump = False
 
-        if per.is_collide(walls, floors, obstacles, coins, floor, win_flag) == 'win':
-            if level != '':
+        if not (any((walls, obstacles, floors, coins))):
+            if (level[17:][:1] == '1' or level[17:][:1] == '2' or level[17:][:1] == '3') and not completed:
                 with sqlite3.connect('game_data.db') as con:
                     cur = con.cursor()
                     cur.execute(
-                        f"""INSERT INTO results (level, coins, score) VALUES ('{level[17:][:1]}', 
-                        '{per.coins_collected}', '{score}')""")
-                    con.commit()
-                change_tab = 'game_win'
-                level = level_creator('data/levels/level.txt')
-
-        if (not (any((walls, obstacles, floors, coins, win_flag))) and
-                per.is_collide(walls, floors, obstacles, coins, floor, win_flag) != 'win'):
-            if level != '':
-                with sqlite3.connect('game_data.db') as con:
-                    cur = con.cursor()
-                    cur.execute(
-                        f"""INSERT INTO results (level, coins, score) VALUES ('{level[17:][:1]}', 
-                        '{per.coins_collected}', '{score}')""")
+                        f"""INSERT INTO results (level, coins, goal) VALUES ('{level[17:][:1]}', 
+                        '{per.coins_collected}', 'failed')""")
                     con.commit()
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
+            elif (level[17:][:1] == '1' or level[17:][:1] == '2' or level[17:][:1] == '3') and completed:
+                with sqlite3.connect('game_data.db') as con:
+                    cur = con.cursor()
+                    cur.execute(
+                        f"""INSERT INTO results (level, coins, goal) VALUES ('{level[17:][:1]}', 
+                        '{per.coins_collected}', 'completed')""")
+                    con.commit()
+                change_tab = 'win'
+                level = level_creator('data/levels/level.txt')
 
-        if not per.flip and j_s - j_e > 160:
-            score += 1
-            j_s = 0
-            j_e = 0
-
-        if not per.flip and round(per.screen_x) % 160 == 0 and level != '' and not game_menu:
-            score += 1
-
-        if per.rect.colliderect(floor):
-            per.floor_rect = floor
-            per.on_the_floor = True
+        if per.rect.colliderect(floor) and not game_menu and per.screen_x != 0:
+            kill_all()
 
         if per.on_the_floor:
             if per.pos[0] <= 800 - 12:
@@ -165,15 +148,14 @@ if __name__ == '__main__':
             walls.update(per)
             floors.update(per)
             obstacles.update(per)
-            win_flag.update(per)
             coins.update(per, obstacles)
-            per.is_collide(walls, floors, obstacles, coins, floor, win_flag)
+            if per.is_collide(walls, floors, obstacles, coins, floor):
+                completed = True
 
         walls.draw(screen)
         floors.draw(screen)
         obstacles.draw(screen)
         coins.draw(screen)
-        win_flag.draw(screen)
         screen.blit(per.image, per.rect)
 
         if change_tab == 'pause':
@@ -218,7 +200,7 @@ if __name__ == '__main__':
             per.if_is_run()
 
         if change_tab == 'game':
-            btn_tab = menu.game_rendering(per.coins_collected, score)
+            btn_tab = menu.game_rendering(per.coins_collected)
 
         if btn_tab == 'paused':
             change_tab = 'pause'
@@ -226,42 +208,34 @@ if __name__ == '__main__':
         if change_tab == 'game_over':
             with sqlite3.connect('game_data.db') as con:
                 cur = con.cursor()
-                y_s = cur.execute(
-                    f"""SELECT score FROM results""").fetchall()
-                y_s = [int(el) for el in y_s[-1]]
                 y_c = cur.execute(
                     f"""SELECT coins FROM results""").fetchall()
                 y_c = [int(el) for el in y_c[-1]]
-            btn_tab = menu.game_over_rendering(y_s, y_c)
+            btn_tab = menu.game_over_rendering(y_c)
 
-        if change_tab == 'game_win':
+        if change_tab == 'win':
             with sqlite3.connect('game_data.db') as con:
                 cur = con.cursor()
-                y_s = cur.execute(
-                    f"""SELECT score FROM results""").fetchall()
-                y_s = [int(el) for el in y_s[-1]]
                 y_c = cur.execute(
                     f"""SELECT coins FROM results""").fetchall()
                 y_c = [int(el) for el in y_c[-1]]
-            btn_tab = menu.game_win_rendering(y_s, y_c)
+            btn_tab = menu.win(y_c)
 
         if btn_tab == 'main':
             game_menu = True
             change_tab = 'main'
             block_hotkey = 0
-            score = 0
             per.coins_collected = 0
 
         if btn_tab == 'quit':
             game_menu = True
             block_hotkey = 0
-            score = 0
             per.coins_collected = 0
 
         if game_menu:
             if change_tab == 'main':
                 per.person_swap(heroes[hero_cnt])
-                score = 0
+                level = level_creator('data/levels/level.txt')
                 per.coins_collected = 0
                 per.flip = False
                 btn_tab = menu.main_menu_rendering1()
@@ -303,20 +277,19 @@ if __name__ == '__main__':
                     hero_cnt = 0
 
             if btn_tab == 'lvl1_btn':
+                per.screen_x = 0
+                per.pos = per.pos[0], 600
                 level = level_creator('data/levels/level1.txt')
-                menu_tab = "main"
                 game_menu = False
                 change_tab = 'game'
                 block_hotkey = 1
             if btn_tab == 'lvl2_btn':
                 level = level_creator('data/levels/level2.txt')
-                menu_tab = "main"
                 game_menu = False
                 change_tab = 'game'
                 block_hotkey = 1
             if btn_tab == 'lvl3_btn':
                 level = level_creator('data/levels/level3.txt')
-                menu_tab = "main"
                 game_menu = False
                 change_tab = 'game'
                 block_hotkey = 1
