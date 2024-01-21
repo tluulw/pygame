@@ -8,6 +8,7 @@ from menu import Menu
 from persona import Person
 from spike import Spike
 from wall import Wall
+from win_flag import WinFlag
 
 if __name__ == '__main__':
     pygame.init()
@@ -23,6 +24,7 @@ if __name__ == '__main__':
     floors = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
     coins = pygame.sprite.Group()
+    win_flag = pygame.sprite.Group()
 
     jump_sound = pygame.mixer.Sound("data/action_jump.mp3")
     pygame.mixer.music.load("data/bg_music.mp3")
@@ -43,6 +45,9 @@ if __name__ == '__main__':
             sprite.kill()
         for sprite in coins:
             sprite.kill()
+        for sprite in win_flag:
+            sprite.kill()
+
 
 
     per = Person(0, 'hero', screen)
@@ -72,7 +77,7 @@ if __name__ == '__main__':
                             Spike(cnt, i.find(x), False, 0, True, obstacles)
                         i = i.replace(x, '.', 1)
                     if x == '!':
-                        Floor(cnt, i.find(x), True, floors)
+                        WinFlag(cnt, i.find(x), win_flag)
                         i = i.replace(x, '.', 1)
                 cnt += 1
         return level_name
@@ -114,6 +119,9 @@ if __name__ == '__main__':
                     con.commit()
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
+                game_over_sound = pygame.mixer.Sound("data/game_over_sound.mp3")
+                game_over_sound.set_volume(0.2)
+                game_over_sound.play()
             elif (level[17:][:1] == '1' or level[17:][:1] == '2' or level[17:][:1] == '3') and completed:
                 with sqlite3.connect('game_data.db') as con:
                     cur = con.cursor()
@@ -148,14 +156,16 @@ if __name__ == '__main__':
             walls.update(per)
             floors.update(per)
             obstacles.update(per)
+            win_flag.update(per)
             coins.update(per, obstacles)
-            if per.is_collide(walls, floors, obstacles, coins, floor):
+            if per.is_collide(walls, floors, obstacles, coins, floor, win_flag):
                 completed = True
 
         walls.draw(screen)
         floors.draw(screen)
         obstacles.draw(screen)
         coins.draw(screen)
+        win_flag.draw(screen)
         screen.blit(per.image, per.rect)
 
         if change_tab == 'pause':
@@ -284,6 +294,8 @@ if __name__ == '__main__':
                 change_tab = 'game'
                 block_hotkey = 1
             if btn_tab == 'lvl2_btn':
+                per.screen_x = 0
+                per.pos = per.pos[0], 600
                 level = level_creator('data/levels/level2.txt')
                 game_menu = False
                 change_tab = 'game'
