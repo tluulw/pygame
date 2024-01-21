@@ -2,6 +2,7 @@ import pygame
 import pygame_widgets
 from pygame_widgets.slider import Slider
 from pygame_widgets.textbox import TextBox
+
 import button
 
 
@@ -15,20 +16,33 @@ class Menu:
         self.small_font = pygame.font.Font("data/ARCADEPI.TTF", 50)
 
         self.TEXT_COL = (255, 215, 0)
+        self.TEXT_COL_RED = (139, 0, 0)
+        self.TEXT_COL_GREEN = (11, 218, 81)
 
-        self.game_over = self.font.render('GAME OVER!', False, self.TEXT_COL)
+        self.game_over = self.font.render('GAME OVER!', False, self.TEXT_COL_RED)
         self.game_over_rect = (
-            size[0] / 2 + 25 - self.game_over.get_width() / 2, 250, self.game_over.get_width(), self.game_over.get_height())
+            size[0] / 2 + 25 - self.game_over.get_width() / 2, 250, self.game_over.get_width(),
+            self.game_over.get_height())
 
-        self.your_coins = self.font.render('YOUR COINS:', False, self.TEXT_COL)
-        self.your_coins_rect = (
-            size[0] / 2 - self.your_coins.get_width() / 2, 350, self.your_coins.get_width(),
-            self.your_coins.get_height())
+        self.your_coins_over = self.font.render('YOUR COINS:', False, self.TEXT_COL_RED)
+        self.your_coins_over_rect = (
+            size[0] / 2 - self.your_coins_over.get_width() / 2, 350, self.your_coins_over.get_width(),
+            self.your_coins_over.get_height())
 
-        self.coins = self.font.render('', False, self.TEXT_COL)
-        self.coins_rect = (
-            size[0] / 2 + 20 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
-            self.coins.get_height())
+        self.coins_over = self.font.render('', False, self.TEXT_COL_RED)
+        self.coins_over_rect = (
+            size[0] / 2 + 20 + self.your_coins_over.get_width() / 2, 350, self.coins_over.get_width(),
+            self.coins_over.get_height())
+
+        self.your_coins_win = self.font.render('YOUR COINS:', False, self.TEXT_COL_GREEN)
+        self.your_coins_win_rect = (
+            size[0] / 2 - self.your_coins_win.get_width() / 2, 350, self.your_coins_win.get_width(),
+            self.your_coins_win.get_height())
+
+        self.coins_win = self.font.render('', False, self.TEXT_COL_GREEN)
+        self.coins_win_rect = (
+            size[0] / 2 + 20 + self.your_coins_win.get_width() / 2, 350, self.coins_win.get_width(),
+            self.coins_win.get_height())
 
         self.play_image = pygame.image.load("data/buttons/play.png")
         self.play_image.set_colorkey(self.play_image.get_at((0, 0)))
@@ -54,14 +68,14 @@ class Menu:
             size[0] / 2 - 67.5, 540, self.save.get_width(),
             self.save.get_height())
 
-        self.you_win = self.font.render('YOU WIN!', False, self.TEXT_COL)
+        self.you_win = self.font.render('YOU WIN!', False, self.TEXT_COL_GREEN)
         self.you_win_rect = (
-            size[0] / 2 - self.you_win.get_width() / 2, 50, self.you_win.get_width(),
+            size[0] / 2 - self.you_win.get_width() / 2 + 30, 50, self.you_win.get_width(),
             self.you_win.get_height())
 
-        self.level_completed = self.font.render('LEVEL COMPLETED!', False, self.TEXT_COL)
+        self.level_completed = self.font.render('LEVEL COMPLETED!', False, self.TEXT_COL_GREEN)
         self.level_completed_rect = (
-            size[0] / 2 - self.level_completed.get_width() / 2, 200, self.level_completed.get_width(),
+            size[0] / 2 - self.level_completed.get_width() / 2 + 50, 200, self.level_completed.get_width(),
             self.level_completed.get_height())
 
         self.quit_image = pygame.image.load("data/buttons/stop.png")
@@ -213,15 +227,15 @@ class Menu:
     def game_over_rendering(self, coins):
         self.screen.blit(self.game_over, self.game_over_rect)
 
-        self.screen.blit(self.your_coins, self.your_coins_rect)
+        self.screen.blit(self.your_coins_over, self.your_coins_over_rect)
 
-        self.coins = self.font.render(f'{coins}', False, self.TEXT_COL)
+        self.coins_over = self.font.render(f'{coins}', False, self.TEXT_COL_RED)
 
-        self.coins_rect = (
-        800 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
-        self.coins.get_height())
+        self.coins_over_rect = (
+            800 + self.your_coins_over.get_width() / 2, 350, self.coins_over.get_width(),
+            self.coins_over.get_height())
 
-        self.screen.blit(self.coins, self.coins_rect)
+        self.screen.blit(self.coins_over, self.coins_over_rect)
 
         if self.quit_button.draw(self.screen):
             return 'quit'
@@ -253,15 +267,15 @@ class Menu:
 
         self.screen.blit(self.level_completed, self.level_completed_rect)
 
-        self.screen.blit(self.your_coins, self.your_coins_rect)
+        self.screen.blit(self.your_coins_win, self.your_coins_win_rect)
 
-        self.coins = self.font.render(f'{coins}', False, self.TEXT_COL)
+        self.coins_win = self.font.render(f'{coins}', False, self.TEXT_COL_GREEN)
 
-        self.coins_rect = (
-            800 + self.your_coins.get_width() / 2, 350, self.coins.get_width(),
-            self.coins.get_height())
+        self.coins_win_rect = (
+            800 + self.your_coins_win.get_width() / 2, 350, self.coins_win.get_width(),
+            self.coins_win.get_height())
 
-        self.screen.blit(self.coins, self.coins_rect)
+        self.screen.blit(self.coins_win, self.coins_win_rect)
 
         if self.quit_button.draw(self.screen):
             return 'quit'

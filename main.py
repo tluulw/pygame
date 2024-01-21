@@ -289,6 +289,8 @@ if __name__ == '__main__':
                 change_tab = 'game'
                 block_hotkey = 1
             if btn_tab == 'lvl3_btn':
+                per.screen_x = 0
+                per.pos = per.pos[0], 600
                 level = level_creator('data/levels/level3.txt')
                 game_menu = False
                 change_tab = 'game'
