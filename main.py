@@ -28,8 +28,8 @@ if __name__ == '__main__':
 
     jump_sound = pygame.mixer.Sound("data/action_jump.mp3")
     pygame.mixer.music.load("data/bg_music.mp3")
-
-    sounds = [jump_sound]
+    game_over_sound = pygame.mixer.Sound("data/game_over_sound.mp3")
+    game_over_sound.set_volume(0.2)
 
     vol = 0.5
     pygame.mixer.music.set_volume(vol)
@@ -47,7 +47,6 @@ if __name__ == '__main__':
             sprite.kill()
         for sprite in win_flag:
             sprite.kill()
-
 
 
     per = Person(0, 'hero', screen)
@@ -95,6 +94,8 @@ if __name__ == '__main__':
     heroes = ['hero', 'samurai']
     hero_cnt = 0
 
+    sounds = [jump_sound]
+
     floor = pygame.Rect(0, 895, 1600, 5)
 
     running = True
@@ -119,8 +120,6 @@ if __name__ == '__main__':
                     con.commit()
                 change_tab = 'game_over'
                 level = level_creator('data/levels/level.txt')
-                game_over_sound = pygame.mixer.Sound("data/game_over_sound.mp3")
-                game_over_sound.set_volume(0.2)
                 game_over_sound.play()
             elif (level[17:][:1] == '1' or level[17:][:1] == '2' or level[17:][:1] == '3') and completed:
                 with sqlite3.connect('game_data.db') as con:
@@ -130,6 +129,7 @@ if __name__ == '__main__':
                         '{per.coins_collected}', 'completed')""")
                     con.commit()
                 change_tab = 'win'
+                completed = False
                 level = level_creator('data/levels/level.txt')
 
         if per.rect.colliderect(floor) and not game_menu and per.screen_x != 0:
@@ -290,6 +290,14 @@ if __name__ == '__main__':
                 per.screen_x = 0
                 per.pos = per.pos[0], 600
                 level = level_creator('data/levels/level1.txt')
+                sounds = [jump_sound, game_over_sound]
+                for el in coins:
+                    sounds.append(el.coin_collected_sound)
+                for el in win_flag:
+                    sounds.append(el.win_sound)
+                for el in sounds:
+                    el.set_volume(menu.sound_slider.getValue())
+                pygame.mixer.music.set_volume(menu.music_slider.getValue())
                 game_menu = False
                 change_tab = 'game'
                 block_hotkey = 1
@@ -297,6 +305,14 @@ if __name__ == '__main__':
                 per.screen_x = 0
                 per.pos = per.pos[0], 600
                 level = level_creator('data/levels/level2.txt')
+                sounds = [jump_sound, game_over_sound]
+                for el in coins:
+                    sounds.append(el.coin_collected_sound)
+                for el in win_flag:
+                    sounds.append(el.win_sound)
+                for el in sounds:
+                    el.set_volume(menu.sound_slider.getValue())
+                pygame.mixer.music.set_volume(menu.music_slider.getValue())
                 game_menu = False
                 change_tab = 'game'
                 block_hotkey = 1
@@ -304,6 +320,14 @@ if __name__ == '__main__':
                 per.screen_x = 0
                 per.pos = per.pos[0], 600
                 level = level_creator('data/levels/level3.txt')
+                sounds = [jump_sound, game_over_sound]
+                for el in coins:
+                    sounds.append(el.coin_collected_sound)
+                for el in win_flag:
+                    sounds.append(el.win_sound)
+                for el in sounds:
+                    el.set_volume(menu.sound_slider.getValue())
+                pygame.mixer.music.set_volume(menu.music_slider.getValue())
                 game_menu = False
                 change_tab = 'game'
                 block_hotkey = 1
@@ -337,13 +361,6 @@ if __name__ == '__main__':
                         per.is_reverse_jump = True
                         per.flip = not per.flip
                         jump_sound.play()
-            if event.type == pygame.KEYDOWN and block_hotkey == 0:
-                if event.key == pygame.K_DOWN:
-                    vol -= 0.1
-                    pygame.mixer.music.set_volume(vol)
-                if event.key == pygame.K_UP:
-                    vol += 0.1
-                    pygame.mixer.music.set_volume(vol)
             if event.type == pygame.KEYUP and block_hotkey == 1:
                 if event.key == pygame.K_SPACE:
                     j_e = per.screen_x
